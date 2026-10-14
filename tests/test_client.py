@@ -11,7 +11,15 @@ import httpx
 import pytest
 import respx
 
-from roicai import ApiError, AsyncRoicai, NotFoundError, Roicai, TooManyRequestsError, __version__
+from roicai import (
+    ApiError,
+    AsyncRoicai,
+    MorePagesWarning,
+    NotFoundError,
+    Roicai,
+    TooManyRequestsError,
+    __version__,
+)
 from roicai._paging import page_token
 
 BASE = "https://api.roic.ai"
@@ -148,7 +156,7 @@ def test_to_pandas_types_columns_from_the_schema(client: Roicai) -> None:
             httpx.Response(200, json=page([statement(2023, is_net_income=None)])),
         ]
     )
-    df = client.fundamentals.income_statements.list("NASDAQ:AAPL").to_pandas()
+    df = client.fundamentals.income_statements.list("NASDAQ:AAPL").to_pandas(all_pages=True)
     assert len(df) == 3
     assert list(df.columns[:5]) == ["id", "symbol", "period_type", "period_end_date", "fiscal_year"]
     assert "object" not in df.columns
@@ -189,7 +197,7 @@ def test_max_items_stops_and_warns(client: Roicai) -> None:
             httpx.Response(200, json=page([statement(2025)])),
         ]
     )
-    with pytest.warns(UserWarning, match="max_items=3"):
+    with pytest.warns(MorePagesWarning, match="max_items=3"):
         df = client.fundamentals.income_statements.list("NASDAQ:AAPL").to_pandas(max_items=3)
     assert len(df) == 3
     assert len(route.calls) == 2
@@ -205,7 +213,7 @@ def test_max_items_at_the_end_of_a_page_does_not_fetch_the_next(client: Roicai) 
             httpx.Response(200, json=page([statement(2023)])),
         ]
     )
-    with pytest.warns(UserWarning, match="max_items=2"):
+    with pytest.warns(MorePagesWarning, match="max_items=2"):
         df = client.fundamentals.income_statements.list("NASDAQ:AAPL").to_pandas(max_items=2)
     assert len(df) == 2
     assert len(route.calls) == 1
@@ -256,7 +264,7 @@ async def test_async_pages_and_frames(async_client: AsyncRoicai) -> None:
         ]
     )
     pager = await async_client.fundamentals.income_statements.list("NASDAQ:AAPL", fiscal_year_lt=2026)
-    df = await pager.to_pandas()
+    df = await pager.to_pandas(all_pages=True)
     assert df["fiscal_year"].tolist() == [2025, 2024]
     assert query(route.calls.last.request) == {"fiscal_year.lt": "2026", "page": "tok2"}
 
@@ -449,6 +457,10 @@ def test_max_items_must_be_a_positive_int(client: Roicai) -> None:
     for bad in (True, 0, -1, 2.5):
         with pytest.raises(ValueError):
             pager.to_pandas(max_items=bad)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="all_pages=False"):
+        pager.to_pandas(max_items=5, all_pages=False)
+    with pytest.raises(ValueError):
+        pager.to_pandas(all_pages="yes")  # type: ignore[arg-type]
 
 
 def test_importing_adds_no_log_handler() -> None:
@@ -456,3 +468,60 @@ def test_importing_adds_no_log_handler() -> None:
 
     code = "import logging, roicai; roicai.Roicai(api_key='k'); print(len(logging.getLogger('roicai').handlers))"
     assert subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True).stdout == "0\n"
+
+
+def two_pages() -> list:
+    return [
+        httpx.Response(200, json=page([statement(2025), statement(2024)], "tok2")),
+        httpx.Response(200, json=page([statement(2023)])),
+    ]
+
+
+@respx.mock
+def test_by_default_a_list_converts_this_page_and_warns(client: Roicai) -> None:
+    route = respx.get(STATEMENTS).mock(side_effect=two_pages())
+    pager = client.fundamentals.income_statements.list("NASDAQ:AAPL", limit=2)
+    with pytest.warns(MorePagesWarning, match=r"to_pandas\(\) converted this page of 2 rows"):
+        df = pager.to_pandas()
+    assert df["fiscal_year"].tolist() == [2025, 2024]
+    with pytest.warns(MorePagesWarning, match=r"to_polars\(\)"):
+        assert pager.to_polars().height == 2
+    assert len(route.calls) == 1
+
+
+@respx.mock
+def test_all_pages_false_converts_this_page_without_a_warning(client: Roicai) -> None:
+    route = respx.get(STATEMENTS).mock(side_effect=two_pages())
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        df = client.fundamentals.income_statements.list("NASDAQ:AAPL", limit=2).to_pandas(all_pages=False)
+    assert len(df) == 2
+    assert len(route.calls) == 1
+
+
+@respx.mock
+def test_the_last_page_converts_without_a_warning(client: Roicai) -> None:
+    respx.get(STATEMENTS).mock(return_value=httpx.Response(200, json=page([statement(2025)])))
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        assert len(client.fundamentals.income_statements.list("NASDAQ:AAPL").to_pandas()) == 1
+
+
+@respx.mock
+def test_all_pages_fetches_every_page(client: Roicai) -> None:
+    route = respx.get(STATEMENTS).mock(side_effect=two_pages())
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        df = client.fundamentals.income_statements.list("NASDAQ:AAPL", limit=2).to_polars(all_pages=True)
+    assert df["fiscal_year"].to_list() == [2025, 2024, 2023]
+    assert len(route.calls) == 2
+
+
+@respx.mock
+async def test_async_default_converts_this_page(async_client: AsyncRoicai) -> None:
+    route = respx.get(STATEMENTS).mock(side_effect=two_pages())
+    pager = await async_client.fundamentals.income_statements.list("NASDAQ:AAPL", limit=2)
+    with pytest.warns(MorePagesWarning):
+        df = await pager.to_pandas()
+    assert len(df) == 2
+    assert len(route.calls) == 1

@@ -45,7 +45,7 @@ from pathlib import Path
 MISSING_KEY = '"The client must be instantiated be either passing in api_key or setting ROICAI_API_KEY"'
 MISSING_KEY_FIX = (
     '"No API key: pass api_key to the client, or set the ROICAI_API_KEY environment variable. '
-    'Get a key at https://roic.ai/api"'
+    'Get a key at https://www.roic.ai/api"'
 )
 API_ERROR_STR = """
     def __str__(self) -> str:

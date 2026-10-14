@@ -162,6 +162,7 @@ if typing.TYPE_CHECKING:
         stock_splits,
         tickers,
     )
+    from ._dataframe import MorePagesWarning
     from ._default_clients import DefaultAioHttpClient, DefaultAsyncHttpxClient
     from ._version import __version__
     from .client import AsyncRoicai, Roicai
@@ -276,6 +277,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "Market": ".types",
     "MarketList": ".types",
     "MarketObject": ".types",
+    "MorePagesWarning": "._dataframe",
     "NotFoundError": ".errors",
     "Order": ".types",
     "PaymentRequiredError": ".errors",
@@ -466,6 +468,7 @@ __all__ = [
     "Market",
     "MarketList",
     "MarketObject",
+    "MorePagesWarning",
     "NotFoundError",
     "Order",
     "PaymentRequiredError",

@@ -29,6 +29,8 @@ groups:
               imports: [AsyncPager, SyncPager]
             - from: core.request_options
               imports: [RequestOptions]
+            - from: _dataframe
+              imports: [MorePagesWarning]
           pyproject_python_version: "^3.10"
           user-agent: "roicai-python/{version}"
           allow_user_agent_app_info: true

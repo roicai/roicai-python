@@ -17,7 +17,7 @@ def sync_usage(client: Roicai) -> None:
         statement: IncomeStatementFinancialPeriod = row
         ended: dt.date = row.period_end_date
         year: typing.Optional[int] = row.fiscal_year
-    frame: pandas.DataFrame = pager.to_pandas(max_items=None)
+    frame: pandas.DataFrame = pager.to_pandas(all_pages=True)
     pl_frame: polars.DataFrame = pager.to_polars(max_items=500)
     ticker: Ticker = client.tickers.retrieve("NASDAQ:AAPL")
     one_row: pandas.DataFrame = ticker.to_pandas()

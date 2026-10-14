@@ -52,8 +52,8 @@ polars = ["polars>=1.0"]
 aiohttp = ["aiohttp>=3.10.0,<4", "httpx-aiohttp>=0.1.8"]
 
 [project.urls]
-Homepage = "https://roic.ai"
-Documentation = "https://roic.ai/api"
+Homepage = "https://www.roic.ai"
+Documentation = "https://www.roic.ai/api"
 Repository = "https://github.com/roicai/roicai-python"
 Issues = "https://github.com/roicai/roicai-python/issues"
 Changelog = "https://github.com/roicai/roicai-python/releases"
