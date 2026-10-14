@@ -1,0 +1,18 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "ROIC.ai Python SDK",
+  "description": "Official Python client for the ROIC.ai financial data and stock API: fundamentals (income statements, balance sheets, cash flow, ratios, multiples), earnings call transcripts, stock and forex prices, SEC filings, earnings calendar and company profiles. Typed Pydantic models, sync and async clients, auto-pagination, and to_pandas()/to_polars() on every response.",
+  "folders": [],
+  "excludeFolders": ["src", "tests", "scripts", "fern", ".github"],
+  "excludeFiles": ["CONTRIBUTING.md"],
+  "rules": [
+    "Install with `pip install roicai`, or `pip install \"roicai[pandas]\"` / `\"roicai[polars]\"` for DataFrames.",
+    "Create the client with `Roicai()` or `AsyncRoicai()`; both read the API key from the ROICAI_API_KEY environment variable. Don't hard-code keys.",
+    "Identify a company as EXCHANGE:SYMBOL (e.g. `NASDAQ:AAPL`), a ticker ID (`tkr_...`) or a FIGI.",
+    "Methods follow the API's URL groups, e.g. `client.fundamentals.income_statements.list(\"NASDAQ:AAPL\", period_type=\"annual\")`; each group has list, retrieve or search.",
+    "A list result's `.items` is the current page; iterating over the result itself fetches every page.",
+    "On a list, `to_pandas()`/`to_polars()` convert only the current page; pass `all_pages=True` or `max_items=N` to fetch more pages. Each page is one billed request.",
+    "Filter ranges with `date_gte`, `date_lte`, `fiscal_year_gte`, `fiscal_year_lte` (and `_gt`/`_lt`); dates are \"YYYY-MM-DD\" strings.",
+    "Catch `roicai.ApiError` or a subclass such as `NotFoundError`; errors have `status_code`, `code`, `message` and `request_id`."
+  ]
+}
