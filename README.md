@@ -4,7 +4,7 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/roicai.svg)](https://pypi.org/project/roicai/)
 [![Build Status](https://github.com/roicai/roicai-python/actions/workflows/ci.yml/badge.svg)](https://github.com/roicai/roicai-python/actions/workflows/ci.yml)
 
-The ROIC.ai Python library is the official Python client for the [ROIC.ai](https://roic.ai) financial data API and stock API. Use it to get fundamentals for public companies, such as income statements, balance sheets, cash flow statements, financial ratios and valuation multiples, and earnings call transcripts. It also covers historical and latest stock prices, SEC filings and other company documents, the earnings calendar, company profiles and forex rates.
+The ROIC.ai Python library is the official Python client for the [ROIC.ai](https://www.roic.ai) financial data API and stock API. Use it to get fundamentals for public companies, such as income statements, balance sheets, cash flow statements, financial ratios and valuation multiples, and earnings call transcripts. It also covers historical and latest stock prices, SEC filings and other company documents, the earnings calendar, company profiles and forex rates.
 
 Responses are typed Pydantic models, list methods fetch the next pages for you, and any response converts to a pandas or polars DataFrame.
 
@@ -94,13 +94,23 @@ print(df[["fiscal_year", "period_end_date", "is_sales_revenue_turnover", "is_net
 
 Columns are the API's fields, in the API's order, with `id`, `symbol` and the period first. Their types come from the API's schema: dates and timestamps are `datetime64` columns, whole numbers are nullable `Int64`, and amounts are `float64`. With polars, dates are `Date` columns.
 
-On a list, `to_pandas()` and `to_polars()` fetch the next pages too, up to 10,000 rows, and warn if they stop early. Each page is one request, so set `max_items` to fetch fewer or more, or `max_items=None` for every page:
+On a list, `to_pandas()` and `to_polars()` convert the page you have: up to `limit` rows. If the list has more pages, they warn with a `MorePagesWarning`. Fetching the rest is up to you, since each page is one more request:
 
 ```python
 prices = client.stock_prices.list("NASDAQ:AAPL", date_gte="2020-01-01", limit=1000)
-closes = prices.to_polars(max_items=None).select("date", "close")
+closes = prices.to_polars(all_pages=True).select("date", "close")
 print(closes.tail())
+
+splits = client.stock_splits.list(identifier="NASDAQ:AAPL", limit=2).to_pandas(max_items=100)
+first_five = client.tickers.list(exchange="NASDAQ", limit=5).to_pandas(all_pages=False)
 ```
+
+| Argument | Rows |
+|---|---|
+| none | This page, with a warning if more pages remain. |
+| `all_pages=True` | Every page. |
+| `max_items=N` | This page and the next ones, up to N rows, with a warning if the list goes on. |
+| `all_pages=False` | This page, without the warning. |
 
 A single object, such as a ticker or a company profile, becomes a DataFrame with one row.
 
@@ -466,7 +476,7 @@ to_usd = client.forex_prices.latest.list(quote_currency="USD")
 
 ## Support
 
-Report bugs and request features in [GitHub issues](https://github.com/roicai/roicai-python/issues). For questions about your account, plan or the data, contact ROIC.ai through [roic.ai](https://roic.ai).
+Report bugs and request features in [GitHub issues](https://github.com/roicai/roicai-python/issues). For questions about your account, plan or the data, contact ROIC.ai through [www.roic.ai](https://www.roic.ai).
 
 The library follows semver. While it is `0.x`, a minor version can include breaking changes, so pin the minor version you use.
 

@@ -106,7 +106,7 @@ class Roicai:
         api_key = api_key if api_key is not None else os.getenv("ROICAI_API_KEY")
         if not api_key:
             raise ApiError(
-                body="No API key: pass api_key to the client, or set the ROICAI_API_KEY environment variable. Get a key at https://roic.ai/api"
+                body="No API key: pass api_key to the client, or set the ROICAI_API_KEY environment variable. Get a key at https://www.roic.ai/api"
             )
         self._client_wrapper = SyncClientWrapper(
             base_url=_get_base_url(base_url=base_url, environment=environment),
@@ -378,7 +378,7 @@ class AsyncRoicai:
         api_key = api_key if api_key is not None else os.getenv("ROICAI_API_KEY")
         if not api_key and async_token is None:
             raise ApiError(
-                body="No API key: pass api_key to the client, or set the ROICAI_API_KEY environment variable. Get a key at https://roic.ai/api"
+                body="No API key: pass api_key to the client, or set the ROICAI_API_KEY environment variable. Get a key at https://www.roic.ai/api"
             )
         self._client_wrapper = AsyncClientWrapper(
             base_url=_get_base_url(base_url=base_url, environment=environment),

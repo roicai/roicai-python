@@ -16,8 +16,6 @@ if typing.TYPE_CHECKING:
 # the same on every row.
 SKIPPED_COLUMNS = frozenset({"object"})
 
-DEFAULT_MAX_ITEMS = 10_000
-
 
 def _import(module: str) -> typing.Any:
     try:
@@ -123,8 +121,13 @@ def build_polars(items: list, row_model: typing.Any) -> polars.DataFrame:
     return frame.select(order + [c for c in frame.columns if c not in columns])
 
 
-def _collect(pager: typing.Any, max_items: typing.Optional[int]) -> list:
-    _check(max_items)
+class MorePagesWarning(UserWarning):
+    """A DataFrame from a list holds fewer rows than the list has: more pages remain."""
+
+
+def _collect(pager: typing.Any, method: str, max_items: typing.Optional[int], all_pages: typing.Optional[bool]) -> list:
+    if _this_page_only(max_items, all_pages):
+        return _this_page(pager, method, all_pages)
     items: list[typing.Any] = []
     for page in pager.iter_pages():
         if _take(items, page, max_items):
@@ -132,12 +135,39 @@ def _collect(pager: typing.Any, max_items: typing.Optional[int]) -> list:
     return items
 
 
-async def _acollect(pager: typing.Any, max_items: typing.Optional[int]) -> list:
-    _check(max_items)
+async def _acollect(
+    pager: typing.Any, method: str, max_items: typing.Optional[int], all_pages: typing.Optional[bool]
+) -> list:
+    if _this_page_only(max_items, all_pages):
+        return _this_page(pager, method, all_pages)
     items: list[typing.Any] = []
     async for page in pager.iter_pages():
         if _take(items, page, max_items):
             break
+    return items
+
+
+def _this_page_only(max_items: typing.Optional[int], all_pages: typing.Optional[bool]) -> bool:
+    """Checks the arguments; returns True when they ask for this page alone."""
+    if max_items is not None and (not isinstance(max_items, int) or isinstance(max_items, bool) or max_items < 1):
+        raise ValueError("max_items must be a positive integer")
+    if all_pages is not None and not isinstance(all_pages, bool):
+        raise ValueError("all_pages must be True, False or None")
+    if all_pages is False and max_items is not None:
+        raise ValueError("max_items fetches more pages, so it can't be combined with all_pages=False")
+    return max_items is None and not all_pages
+
+
+def _this_page(pager: typing.Any, method: str, all_pages: typing.Optional[bool]) -> list:
+    items = list(pager.items or [])
+    if all_pages is None and pager.has_next:
+        warnings.warn(
+            f"{method}() converted this page of {len(items)} rows, and more pages remain. "
+            "Pass all_pages=True to fetch every page, max_items=N to fetch up to N rows, "
+            "or all_pages=False to convert this page without this warning.",
+            MorePagesWarning,
+            stacklevel=4,
+        )
     return items
 
 
@@ -156,21 +186,13 @@ def _take(items: list, page: typing.Any, max_items: typing.Optional[int]) -> boo
     if len(items) < max_items:
         return False
     if len(page_items) > room or page.has_next:
-        _warn_truncated(max_items)
+        warnings.warn(
+            f"Stopped after max_items={max_items} rows, and more pages remain. "
+            "Pass a larger max_items, or all_pages=True to fetch every page.",
+            MorePagesWarning,
+            stacklevel=4,
+        )
     return True
-
-
-def _check(max_items: typing.Optional[int]) -> None:
-    if max_items is not None and (not isinstance(max_items, int) or isinstance(max_items, bool) or max_items < 1):
-        raise ValueError("max_items must be a positive integer, or None for no limit")
-
-
-def _warn_truncated(max_items: int) -> None:
-    warnings.warn(
-        f"Stopped after max_items={max_items} rows; more pages remain. "
-        "Pass a larger max_items, or max_items=None to fetch every page.",
-        stacklevel=5,
-    )
 
 
 class ModelFrameMixin:
@@ -195,44 +217,76 @@ class ModelFrameMixin:
 
 
 class SyncPagerFrameMixin:
-    """DataFrame conversion for list methods, fetching later pages as needed."""
+    """DataFrame conversion for list methods."""
 
-    def to_pandas(self, *, max_items: typing.Optional[int] = DEFAULT_MAX_ITEMS) -> pandas.DataFrame:
-        """Returns the items of this page and the pages after it as a pandas DataFrame.
+    def to_pandas(
+        self, *, max_items: typing.Optional[int] = None, all_pages: typing.Optional[bool] = None
+    ) -> pandas.DataFrame:
+        """Returns the items of this list as a pandas DataFrame. Needs pandas: pip install "roicai[pandas]".
 
-        Fetches pages until the list ends or `max_items` items are in hand,
-        warning if it stops early. Pass `max_items=None` for no limit: every
-        page is one request. Needs pandas: pip install "roicai[pandas]".
+        By default this converts this page only, with a MorePagesWarning if
+        more pages remain. Each further page is one more request:
+
+        - `max_items=N` fetches the next pages until N rows are in hand,
+          warning if it stops before the list ends.
+        - `all_pages=True` fetches every page.
+        - `all_pages=False` converts this page without the warning.
         """
         _import("pandas")
-        return build_pandas(_collect(self, max_items), _row_model(self.response))  # type: ignore[attr-defined]
+        items = _collect(self, "to_pandas", max_items, all_pages)
+        return build_pandas(items, _row_model(self.response))  # type: ignore[attr-defined]
 
-    def to_polars(self, *, max_items: typing.Optional[int] = DEFAULT_MAX_ITEMS) -> polars.DataFrame:
-        """Returns the items of this page and the pages after it as a polars DataFrame.
+    def to_polars(
+        self, *, max_items: typing.Optional[int] = None, all_pages: typing.Optional[bool] = None
+    ) -> polars.DataFrame:
+        """Returns the items of this list as a polars DataFrame. Needs polars: pip install "roicai[polars]".
 
-        Fetches pages like to_pandas(). Needs polars: pip install "roicai[polars]".
+        By default this converts this page only, with a MorePagesWarning if
+        more pages remain. Each further page is one more request:
+
+        - `max_items=N` fetches the next pages until N rows are in hand,
+          warning if it stops before the list ends.
+        - `all_pages=True` fetches every page.
+        - `all_pages=False` converts this page without the warning.
         """
         _import("polars")
-        return build_polars(_collect(self, max_items), _row_model(self.response))  # type: ignore[attr-defined]
+        items = _collect(self, "to_polars", max_items, all_pages)
+        return build_polars(items, _row_model(self.response))  # type: ignore[attr-defined]
 
 
 class AsyncPagerFrameMixin:
-    """DataFrame conversion for async list methods, fetching later pages as needed."""
+    """DataFrame conversion for async list methods."""
 
-    async def to_pandas(self, *, max_items: typing.Optional[int] = DEFAULT_MAX_ITEMS) -> pandas.DataFrame:
-        """Returns the items of this page and the pages after it as a pandas DataFrame.
+    async def to_pandas(
+        self, *, max_items: typing.Optional[int] = None, all_pages: typing.Optional[bool] = None
+    ) -> pandas.DataFrame:
+        """Returns the items of this list as a pandas DataFrame. Needs pandas: pip install "roicai[pandas]".
 
-        Fetches pages until the list ends or `max_items` items are in hand,
-        warning if it stops early. Pass `max_items=None` for no limit: every
-        page is one request. Needs pandas: pip install "roicai[pandas]".
+        By default this converts this page only, with a MorePagesWarning if
+        more pages remain. Each further page is one more request:
+
+        - `max_items=N` fetches the next pages until N rows are in hand,
+          warning if it stops before the list ends.
+        - `all_pages=True` fetches every page.
+        - `all_pages=False` converts this page without the warning.
         """
         _import("pandas")
-        return build_pandas(await _acollect(self, max_items), _row_model(self.response))  # type: ignore[attr-defined]
+        items = await _acollect(self, "to_pandas", max_items, all_pages)
+        return build_pandas(items, _row_model(self.response))  # type: ignore[attr-defined]
 
-    async def to_polars(self, *, max_items: typing.Optional[int] = DEFAULT_MAX_ITEMS) -> polars.DataFrame:
-        """Returns the items of this page and the pages after it as a polars DataFrame.
+    async def to_polars(
+        self, *, max_items: typing.Optional[int] = None, all_pages: typing.Optional[bool] = None
+    ) -> polars.DataFrame:
+        """Returns the items of this list as a polars DataFrame. Needs polars: pip install "roicai[polars]".
 
-        Fetches pages like to_pandas(). Needs polars: pip install "roicai[polars]".
+        By default this converts this page only, with a MorePagesWarning if
+        more pages remain. Each further page is one more request:
+
+        - `max_items=N` fetches the next pages until N rows are in hand,
+          warning if it stops before the list ends.
+        - `all_pages=True` fetches every page.
+        - `all_pages=False` converts this page without the warning.
         """
         _import("polars")
-        return build_polars(await _acollect(self, max_items), _row_model(self.response))  # type: ignore[attr-defined]
+        items = await _acollect(self, "to_polars", max_items, all_pages)
+        return build_polars(items, _row_model(self.response))  # type: ignore[attr-defined]
