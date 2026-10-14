@@ -92,7 +92,8 @@ class Logger:
             self._logger.error(message, **kwargs)
 
 
-_default_logger: Logger = Logger(level="info", logger=ConsoleLogger(), silent=True)
+# Silent, so it never logs: a ConsoleLogger would add a handler on import.
+_default_logger: Logger = Logger(level="info", logger=typing.cast(ILogger, logging.getLogger("roicai")), silent=True)
 
 
 def create_logger(config: typing.Optional[typing.Union[LogConfig, Logger]] = None) -> Logger:

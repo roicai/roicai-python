@@ -35,7 +35,7 @@ class DocumentsClient:
         return self._raw_client
 
     @property
-    def slides(self):
+    def slides(self) -> SlidesClient:
         if self._slides is None:
             from .slides.client import SlidesClient  # noqa: E402
 
@@ -43,7 +43,7 @@ class DocumentsClient:
         return self._slides
 
     @property
-    def filings(self):
+    def filings(self) -> FilingsClient:
         if self._filings is None:
             from .filings.client import FilingsClient  # noqa: E402
 
@@ -51,7 +51,7 @@ class DocumentsClient:
         return self._filings
 
     @property
-    def audio(self):
+    def audio(self) -> AudioClient:
         if self._audio is None:
             from .audio.client import AudioClient  # noqa: E402
 
@@ -59,7 +59,7 @@ class DocumentsClient:
         return self._audio
 
     @property
-    def transcripts(self):
+    def transcripts(self) -> TranscriptsClient:
         if self._transcripts is None:
             from .transcripts.client import TranscriptsClient  # noqa: E402
 
@@ -88,7 +88,7 @@ class AsyncDocumentsClient:
         return self._raw_client
 
     @property
-    def slides(self):
+    def slides(self) -> AsyncSlidesClient:
         if self._slides is None:
             from .slides.client import AsyncSlidesClient  # noqa: E402
 
@@ -96,7 +96,7 @@ class AsyncDocumentsClient:
         return self._slides
 
     @property
-    def filings(self):
+    def filings(self) -> AsyncFilingsClient:
         if self._filings is None:
             from .filings.client import AsyncFilingsClient  # noqa: E402
 
@@ -104,7 +104,7 @@ class AsyncDocumentsClient:
         return self._filings
 
     @property
-    def audio(self):
+    def audio(self) -> AsyncAudioClient:
         if self._audio is None:
             from .audio.client import AsyncAudioClient  # noqa: E402
 
@@ -112,7 +112,7 @@ class AsyncDocumentsClient:
         return self._audio
 
     @property
-    def transcripts(self):
+    def transcripts(self) -> AsyncTranscriptsClient:
         if self._transcripts is None:
             from .transcripts.client import AsyncTranscriptsClient  # noqa: E402
 

@@ -37,7 +37,7 @@ class RatiosClient:
         return self._raw_client
 
     @property
-    def profitability(self):
+    def profitability(self) -> ProfitabilityClient:
         if self._profitability is None:
             from .profitability.client import ProfitabilityClient  # noqa: E402
 
@@ -45,7 +45,7 @@ class RatiosClient:
         return self._profitability
 
     @property
-    def credit(self):
+    def credit(self) -> CreditClient:
         if self._credit is None:
             from .credit.client import CreditClient  # noqa: E402
 
@@ -53,7 +53,7 @@ class RatiosClient:
         return self._credit
 
     @property
-    def liquidity(self):
+    def liquidity(self) -> LiquidityClient:
         if self._liquidity is None:
             from .liquidity.client import LiquidityClient  # noqa: E402
 
@@ -61,7 +61,7 @@ class RatiosClient:
         return self._liquidity
 
     @property
-    def working_capital(self):
+    def working_capital(self) -> WorkingCapitalClient:
         if self._working_capital is None:
             from .working_capital.client import WorkingCapitalClient  # noqa: E402
 
@@ -69,7 +69,7 @@ class RatiosClient:
         return self._working_capital
 
     @property
-    def yield_analysis(self):
+    def yield_analysis(self) -> YieldAnalysisClient:
         if self._yield_analysis is None:
             from .yield_analysis.client import YieldAnalysisClient  # noqa: E402
 
@@ -99,7 +99,7 @@ class AsyncRatiosClient:
         return self._raw_client
 
     @property
-    def profitability(self):
+    def profitability(self) -> AsyncProfitabilityClient:
         if self._profitability is None:
             from .profitability.client import AsyncProfitabilityClient  # noqa: E402
 
@@ -107,7 +107,7 @@ class AsyncRatiosClient:
         return self._profitability
 
     @property
-    def credit(self):
+    def credit(self) -> AsyncCreditClient:
         if self._credit is None:
             from .credit.client import AsyncCreditClient  # noqa: E402
 
@@ -115,7 +115,7 @@ class AsyncRatiosClient:
         return self._credit
 
     @property
-    def liquidity(self):
+    def liquidity(self) -> AsyncLiquidityClient:
         if self._liquidity is None:
             from .liquidity.client import AsyncLiquidityClient  # noqa: E402
 
@@ -123,7 +123,7 @@ class AsyncRatiosClient:
         return self._liquidity
 
     @property
-    def working_capital(self):
+    def working_capital(self) -> AsyncWorkingCapitalClient:
         if self._working_capital is None:
             from .working_capital.client import AsyncWorkingCapitalClient  # noqa: E402
 
@@ -131,7 +131,7 @@ class AsyncRatiosClient:
         return self._working_capital
 
     @property
-    def yield_analysis(self):
+    def yield_analysis(self) -> AsyncYieldAnalysisClient:
         if self._yield_analysis is None:
             from .yield_analysis.client import AsyncYieldAnalysisClient  # noqa: E402
 

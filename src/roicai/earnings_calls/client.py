@@ -86,7 +86,7 @@ class EarningsCallsClient:
             Maximum number of resources to return. Defaults to 50.
 
         page : typing.Optional[str]
-            Opaque page token from a previous response. Prefer following the returned page URLs directly.
+            Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -183,7 +183,7 @@ class EarningsCallsClient:
         return _response.data
 
     @property
-    def bulk(self):
+    def bulk(self) -> BulkClient:
         if self._bulk is None:
             from .bulk.client import BulkClient  # noqa: E402
 
@@ -259,7 +259,7 @@ class AsyncEarningsCallsClient:
             Maximum number of resources to return. Defaults to 50.
 
         page : typing.Optional[str]
-            Opaque page token from a previous response. Prefer following the returned page URLs directly.
+            Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -373,7 +373,7 @@ class AsyncEarningsCallsClient:
         return _response.data
 
     @property
-    def bulk(self):
+    def bulk(self) -> AsyncBulkClient:
         if self._bulk is None:
             from .bulk.client import AsyncBulkClient  # noqa: E402
 

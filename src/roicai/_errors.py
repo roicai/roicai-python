@@ -4,6 +4,37 @@
 from __future__ import annotations
 
 import typing
+from json import JSONDecodeError
+
+import pydantic
+
+if typing.TYPE_CHECKING:
+    import httpx
+
+
+def error_body(response: httpx.Response) -> typing.Any:
+    """The body of an error response: the API's Error model, or the raw JSON or text.
+
+    A response from a proxy, such as an HTML error page, still raises the
+    error class for its status, with the page as its body.
+    """
+    from .core.pydantic_utilities import parse_obj_as
+    from .types.error import Error
+
+    try:
+        data = response.json()
+    except JSONDecodeError:
+        return response.text
+    try:
+        return parse_obj_as(Error, data)
+    except pydantic.ValidationError:
+        return data
+
+
+def _rebuild(cls: type, state: dict) -> typing.Any:
+    error = cls.__new__(cls)  # type: ignore[call-overload]
+    error.__dict__.update(state)
+    return error
 
 
 class ApiErrorDetailsMixin:
@@ -44,6 +75,19 @@ class ApiErrorDetailsMixin:
     def request_id(self) -> typing.Optional[str]:
         """The ID of the request, to quote to support."""
         return self._detail("request_id")
+
+    def __reduce__(self) -> typing.Any:
+        # The generated subclasses take different __init__ arguments, so they
+        # are rebuilt from their attributes, for pickle, copy and multiprocessing.
+        return (_rebuild, (type(self), dict(self.__dict__)))
+
+    def __repr__(self) -> str:
+        if self.status_code is None:
+            return f"{type(self).__name__}({self.body!r})"
+        return (
+            f"{type(self).__name__}(status_code={self.status_code}, message={self.message!r}, "
+            f"code={self.code!r}, request_id={self.request_id!r})"
+        )
 
     def __str__(self) -> str:
         message = self.message

@@ -76,7 +76,7 @@ class ForexPricesClient:
             Maximum number of resources to return. Defaults to 250.
 
         page : typing.Optional[str]
-            Opaque page token from a previous response. Prefer following the returned page URLs directly.
+            Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -116,7 +116,7 @@ class ForexPricesClient:
         )
 
     @property
-    def latest(self):
+    def latest(self) -> LatestClient:
         if self._latest is None:
             from .latest.client import LatestClient  # noqa: E402
 
@@ -184,7 +184,7 @@ class AsyncForexPricesClient:
             Maximum number of resources to return. Defaults to 250.
 
         page : typing.Optional[str]
-            Opaque page token from a previous response. Prefer following the returned page URLs directly.
+            Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -233,7 +233,7 @@ class AsyncForexPricesClient:
         )
 
     @property
-    def latest(self):
+    def latest(self) -> AsyncLatestClient:
         if self._latest is None:
             from .latest.client import AsyncLatestClient  # noqa: E402
 

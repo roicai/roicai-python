@@ -10,7 +10,7 @@ requires-python = ">=3.10"
 dependencies = [
   "httpx>=0.21.2",
   "pydantic>=2.1",
-  "typing_extensions>=4.0.0",
+  "typing_extensions>=4.6.1",
 ]
 keywords = [
   "roic",
@@ -115,6 +115,11 @@ python_version = "3.10"
 strict = false
 check_untyped_defs = true
 
+[[tool.mypy.overrides]]
+# The type tests must catch the errors they mark as ignored.
+module = ["test_types", "roicai._dataframe", "roicai._errors", "roicai._paging", "roicai._version"]
+warn_unused_ignores = true
+
 [tool.pyright]
 # Fern's generated code doesn't pass pyright's strictest checks, so only the
 # hand-written files and the type tests are checked; mypy checks everything.
@@ -126,3 +131,4 @@ include = [
   "tests/test_types.py",
 ]
 pythonVersion = "3.10"
+reportUnnecessaryTypeIgnoreComment = "error"

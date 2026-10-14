@@ -427,7 +427,7 @@ client.tickers.list()
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -524,7 +524,7 @@ client.tickers.search(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -735,7 +735,7 @@ client.stock_splits.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -889,7 +889,7 @@ client.stock_prices.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -1014,7 +1014,7 @@ client.forex_pairs.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -1152,7 +1152,7 @@ client.forex_prices.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -1306,7 +1306,7 @@ client.earnings_calls.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -1511,7 +1511,7 @@ client.company_events.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -1649,7 +1649,7 @@ client.calendar.earnings.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -1861,7 +1861,7 @@ client.companies.employees.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -2673,7 +2673,7 @@ client.forex_prices.latest.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -2932,7 +2932,7 @@ client.fundamentals.income_statements.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -3118,7 +3118,7 @@ client.fundamentals.balance_sheets.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -3304,7 +3304,7 @@ client.fundamentals.cash_flow_statements.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -3490,7 +3490,7 @@ client.fundamentals.enterprise_values.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -3676,7 +3676,7 @@ client.fundamentals.multiples.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -3862,7 +3862,7 @@ client.fundamentals.per_share_metrics.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -4120,7 +4120,7 @@ client.fundamentals.ratios.profitability.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -4298,7 +4298,7 @@ client.fundamentals.ratios.credit.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -4484,7 +4484,7 @@ client.fundamentals.ratios.liquidity.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -4670,7 +4670,7 @@ client.fundamentals.ratios.working_capital.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -4856,7 +4856,7 @@ client.fundamentals.ratios.yield_analysis.list(
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>
@@ -4952,7 +4952,7 @@ client.stock_prices.latest.list()
 <dl>
 <dd>
 
-**page:** `typing.Optional[str]` — Opaque page token from a previous response. Prefer following the returned page URLs directly.
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
     
 </dd>
 </dl>

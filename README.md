@@ -10,7 +10,7 @@ Responses are typed Pydantic models, list methods fetch the next pages for you, 
 
 ## Documentation
 
-See the [ROIC.ai API reference](https://api.roic.ai/v3.0.0/openapi) for every endpoint, parameter and field, and the [API guides](https://www.roic.ai/api) for authentication, plans and response formats. [reference.md](reference.md) lists every method of this library with its parameters.
+See the [ROIC.ai API reference](https://api.roic.ai/v3.0.0/openapi) for every endpoint, parameter and field, and the [API guides](https://www.roic.ai/api) for authentication, plans and response formats. [reference.md](https://github.com/roicai/roicai-python/blob/main/reference.md) lists every method of this library with its parameters.
 
 ## Requirements
 
@@ -64,7 +64,7 @@ Identify a company by its exchange and symbol separated by a colon (`NASDAQ:AAPL
 
 ### Types
 
-Responses are [Pydantic](https://docs.pydantic.dev) models with the API's field names, which are snake_case. Dates are `datetime.date` and timestamps are timezone-aware `datetime.datetime`. Every parameter and field is typed, and enums are string literals, so your editor completes them and mypy or pyright checks them:
+Responses are [Pydantic](https://docs.pydantic.dev) models with the API's field names, which are snake_case. Dates are `datetime.date` and timestamps are timezone-aware `datetime.datetime`. Every parameter and field is typed, so your editor completes them and mypy or pyright checks your calls. Enums are string literals that also accept other strings, so values the API adds later still parse:
 
 ```python
 from roicai import IncomeStatementFinancialPeriod
@@ -162,16 +162,16 @@ from roicai import AsyncRoicai
 
 
 async def main() -> None:
-    client = AsyncRoicai()
-    ticker = await client.tickers.retrieve("NASDAQ:MSFT")
-    print(ticker.name)
+    async with AsyncRoicai() as client:
+        ticker = await client.tickers.retrieve("NASDAQ:MSFT")
+        print(ticker.name)
 
-    pager = await client.fundamentals.ratios.profitability.list("NASDAQ:MSFT", period_type="annual")
-    async for year in pager:
-        print(year.fiscal_year, year.gross_margin)
+        pager = await client.fundamentals.ratios.profitability.list("NASDAQ:MSFT", period_type="annual")
+        async for year in pager:
+            print(year.fiscal_year, year.gross_margin)
 
-    df = await pager.to_pandas()
-    print(df.shape)
+        df = await pager.to_pandas()
+        print(df.shape)
 
 
 asyncio.run(main())
@@ -227,7 +227,7 @@ client = Roicai(
 |---|---|---|
 | `api_key` | `ROICAI_API_KEY` | Your API key, sent as `Authorization: Bearer <key>`. |
 | `base_url` | `https://api.roic.ai` | URL that requests are made to. |
-| `timeout` | `60` | Seconds to wait for a response. |
+| `timeout` | `60` | Seconds to wait for a response. With your own `httpx_client`, that client's timeout applies instead. |
 | `max_retries` | `2` | Retries for a request that fails with a `408`, `409`, `429` or `5xx` status. |
 | `headers` | | Headers sent with every request. |
 | `app_info` | | Your application's `name`, and optionally `version` and `comment`, added to the `User-Agent`. If you build a library or plugin on ROIC.ai, please set it. |
@@ -235,7 +235,7 @@ client = Roicai(
 
 ### Retries
 
-The library retries a request up to `max_retries` times when it fails with a `408`, `409`, `429` or `5xx` status. It waits as long as the response's `Retry-After` header asks, or with exponential backoff and jitter. Set `max_retries=0` to turn retries off.
+The library retries a request up to `max_retries` times when it fails with a `408`, `409`, `429` or `5xx` status, or can't connect. It waits as long as the response's `Retry-After` header asks, or with exponential backoff and jitter. Set `max_retries=0` to turn retries off.
 
 ### Per-request options
 
@@ -252,7 +252,7 @@ It takes `timeout`, `max_retries`, `additional_headers` and `additional_query_pa
 
 ### Response headers
 
-`with_raw_response` returns the HTTP response alongside the model, such as to read the request ID:
+`with_raw_response` returns the HTTP response alongside the model, such as to read the request ID. It works on methods that return one object, such as `retrieve`:
 
 ```python
 raw = client.tickers.with_raw_response.retrieve("NASDAQ:AAPL")
@@ -273,9 +273,20 @@ client = Roicai(
 )
 ```
 
+### Closing the client
+
+A client keeps its connections open for reuse. Close it when you're done, or use it as a context manager:
+
+```python
+with Roicai() as client:
+    print(client.tickers.retrieve("NASDAQ:AAPL").name)
+```
+
+`AsyncRoicai` has `aclose()` and works with `async with`. A client you pass `httpx_client` to closes that client too.
+
 ### Logging
 
-The library logs to the `roicai` logger. Pass `logging` to turn on its messages about requests, responses and retries, without your API key:
+The library logs to the `roicai` logger. Pass `logging` to turn on its messages about requests and responses, which never include your API key:
 
 ```python
 client = Roicai(logging={"level": "debug", "silent": False})
@@ -461,8 +472,8 @@ The library follows semver. While it is `0.x`, a minor version can include break
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) to build and test the library, regenerate it from the API, and release it.
+See [CONTRIBUTING.md](https://github.com/roicai/roicai-python/blob/main/CONTRIBUTING.md) to build and test the library, regenerate it from the API, and release it.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](https://github.com/roicai/roicai-python/blob/main/LICENSE)

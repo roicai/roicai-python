@@ -161,7 +161,7 @@ def _take(items: list, page: typing.Any, max_items: typing.Optional[int]) -> boo
 
 
 def _check(max_items: typing.Optional[int]) -> None:
-    if max_items is not None and (not isinstance(max_items, int) or max_items < 1):
+    if max_items is not None and (not isinstance(max_items, int) or isinstance(max_items, bool) or max_items < 1):
         raise ValueError("max_items must be a positive integer, or None for no limit")
 
 

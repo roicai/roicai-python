@@ -86,7 +86,7 @@ class StockPricesClient:
             Maximum number of resources to return. Defaults to 250.
 
         page : typing.Optional[str]
-            Opaque page token from a previous response. Prefer following the returned page URLs directly.
+            Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -128,7 +128,7 @@ class StockPricesClient:
         )
 
     @property
-    def latest(self):
+    def latest(self) -> LatestClient:
         if self._latest is None:
             from .latest.client import LatestClient  # noqa: E402
 
@@ -136,7 +136,7 @@ class StockPricesClient:
         return self._latest
 
     @property
-    def bulk(self):
+    def bulk(self) -> BulkClient:
         if self._bulk is None:
             from .bulk.client import BulkClient  # noqa: E402
 
@@ -211,7 +211,7 @@ class AsyncStockPricesClient:
             Maximum number of resources to return. Defaults to 250.
 
         page : typing.Optional[str]
-            Opaque page token from a previous response. Prefer following the returned page URLs directly.
+            Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -262,7 +262,7 @@ class AsyncStockPricesClient:
         )
 
     @property
-    def latest(self):
+    def latest(self) -> AsyncLatestClient:
         if self._latest is None:
             from .latest.client import AsyncLatestClient  # noqa: E402
 
@@ -270,7 +270,7 @@ class AsyncStockPricesClient:
         return self._latest
 
     @property
-    def bulk(self):
+    def bulk(self) -> AsyncBulkClient:
         if self._bulk is None:
             from .bulk.client import AsyncBulkClient  # noqa: E402
 

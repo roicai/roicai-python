@@ -654,6 +654,32 @@ class HttpClient:
             files=request_files,
             timeout=timeout,
         ) as stream:
+            _max_retries = (
+                request_options.get("max_retries", self.base_max_retries)
+                if request_options is not None
+                else self.base_max_retries
+            )
+            if not (_should_retry(response=stream) and retries < _max_retries):
+                yield stream
+                return
+            _delay = _retry_timeout(response=stream, retries=retries)
+        time.sleep(_delay)
+        with self.stream(
+            path,
+            method=method,
+            base_url=base_url,
+            params=params,
+            json=json,
+            data=data,
+            content=content,
+            files=files,
+            headers=headers,
+            request_options=request_options,
+            retries=retries + 1,
+            omit=omit,
+            optional_body=optional_body,
+            force_multipart=force_multipart,
+        ) as stream:
             yield stream
 
 
@@ -971,5 +997,31 @@ class AsyncHttpClient:
             content=content,
             files=request_files,
             timeout=timeout,
+        ) as stream:
+            _max_retries = (
+                request_options.get("max_retries", self.base_max_retries)
+                if request_options is not None
+                else self.base_max_retries
+            )
+            if not (_should_retry(response=stream) and retries < _max_retries):
+                yield stream
+                return
+            _delay = _retry_timeout(response=stream, retries=retries)
+        await asyncio.sleep(_delay)
+        async with self.stream(
+            path,
+            method=method,
+            base_url=base_url,
+            params=params,
+            json=json,
+            data=data,
+            content=content,
+            files=files,
+            headers=headers,
+            request_options=request_options,
+            retries=retries + 1,
+            omit=omit,
+            optional_body=optional_body,
+            force_multipart=force_multipart,
         ) as stream:
             yield stream

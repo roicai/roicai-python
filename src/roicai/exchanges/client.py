@@ -59,7 +59,7 @@ class ExchangesClient:
         return _response.data
 
     @property
-    def trading_hours(self):
+    def trading_hours(self) -> TradingHoursClient:
         if self._trading_hours is None:
             from .trading_hours.client import TradingHoursClient  # noqa: E402
 
@@ -67,7 +67,7 @@ class ExchangesClient:
         return self._trading_hours
 
     @property
-    def holidays(self):
+    def holidays(self) -> HolidaysClient:
         if self._holidays is None:
             from .holidays.client import HolidaysClient  # noqa: E402
 
@@ -128,7 +128,7 @@ class AsyncExchangesClient:
         return _response.data
 
     @property
-    def trading_hours(self):
+    def trading_hours(self) -> AsyncTradingHoursClient:
         if self._trading_hours is None:
             from .trading_hours.client import AsyncTradingHoursClient  # noqa: E402
 
@@ -136,7 +136,7 @@ class AsyncExchangesClient:
         return self._trading_hours
 
     @property
-    def holidays(self):
+    def holidays(self) -> AsyncHolidaysClient:
         if self._holidays is None:
             from .holidays.client import AsyncHolidaysClient  # noqa: E402
 
