@@ -9,7 +9,8 @@ what the SDK sends:
 - The `apikey` query parameter is dropped: the SDK sends the key as a bearer
   token, named `api_key` and read from ROICAI_API_KEY.
 - Dotted group names (`fundamentals.ratios`) become nested groups.
-- List operations get Fern's pagination settings.
+- List operations get Fern's pagination settings, and `page` says how the SDK
+  pages.
 - Objects the API inlines are replaced with references to the named schemas
   they came from, so a list's items are `Ticker` rather than
   `V3TickerListDataItem`. Schema names lose their `v3.` prefix.
@@ -53,6 +54,14 @@ def main(src: str, dst: str) -> None:
     for op in operations(doc):
         op["security"] = [{"bearerAuth": []}]
         op["parameters"] = [p for p in op.get("parameters", []) if p.get("name") != "apikey"]
+        for param in op["parameters"]:
+            if param.get("name") == "page" and param.get("in") == "query":
+                # The API's text says to follow next_page_url; the SDK follows
+                # pages itself, with the token.
+                param["schema"]["description"] = (
+                    "Page token from a previous page's `next_page_url`. Iterating over the result "
+                    "fetches the next pages for you."
+                )
         group = op.get("x-fern-sdk-group-name")
         if isinstance(group, str):
             op["x-fern-sdk-group-name"] = group.split(".")

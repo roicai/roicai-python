@@ -23,6 +23,11 @@ def sync_usage(client: Roicai) -> None:
     one_row: pandas.DataFrame = ticker.to_pandas()
     every_exchange: polars.DataFrame = client.exchanges.list().to_polars()
 
+    # The checkers must catch these: an unused ignore is an error in both.
+    client.tickers.retrieve(123)  # type: ignore[arg-type]
+    client.fundamentals.income_statements.list("NASDAQ:AAPL", limit="5")  # type: ignore[arg-type]
+    name: int = ticker.symbol  # type: ignore[assignment]
+
 
 async def async_usage(client: AsyncRoicai) -> None:
     pager = await client.fundamentals.income_statements.list("NASDAQ:AAPL")

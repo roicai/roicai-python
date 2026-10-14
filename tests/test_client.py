@@ -259,3 +259,200 @@ async def test_async_pages_and_frames(async_client: AsyncRoicai) -> None:
     df = await pager.to_pandas()
     assert df["fiscal_year"].tolist() == [2025, 2024]
     assert query(route.calls.last.request) == {"fiscal_year.lt": "2026", "page": "tok2"}
+
+
+@respx.mock
+def test_next_page_is_none_on_the_last_page(client: Roicai) -> None:
+    route = respx.get(STATEMENTS).mock(
+        side_effect=[
+            httpx.Response(200, json=page([statement(2025)], "tok2")),
+            httpx.Response(200, json=page([statement(2024)])),
+        ]
+    )
+    first = client.fundamentals.income_statements.list("NASDAQ:AAPL")
+    second = first.next_page()
+    assert second is not None and [r.fiscal_year for r in second.items or []] == [2024]
+    assert second.next_page() is None
+    assert len(route.calls) == 2
+
+
+@respx.mock
+async def test_async_next_page_is_none_on_the_last_page(async_client: AsyncRoicai) -> None:
+    route = respx.get(STATEMENTS).mock(return_value=httpx.Response(200, json=page([statement(2025)])))
+    pager = await async_client.fundamentals.income_statements.list("NASDAQ:AAPL")
+    assert await pager.next_page() is None
+    assert len(route.calls) == 1
+
+
+@pytest.fixture
+def sleeps(monkeypatch: pytest.MonkeyPatch) -> list:
+    """Records the waits between retries instead of waiting."""
+    import roicai.core.http_client as http_client
+
+    waits: list = []
+
+    async def asleep(seconds: float) -> None:
+        waits.append(seconds)
+
+    monkeypatch.setattr(http_client.time, "sleep", waits.append)
+    monkeypatch.setattr(http_client.asyncio, "sleep", asleep)
+    return waits
+
+
+@respx.mock
+def test_streamed_responses_are_retried(sleeps: list) -> None:
+    route = respx.get(f"{BASE}/v3.0.0/company/logo/NASDAQ:AAPL").mock(
+        side_effect=[
+            httpx.Response(429, headers={"Retry-After": "3"}, json={"error": {"message": "slow down"}}),
+            httpx.Response(503, headers={"Retry-After": "1"}),
+            httpx.Response(200, content=b"RIFFlogo"),
+        ]
+    )
+    client = Roicai(api_key="test_key", max_retries=2)
+    assert b"".join(client.companies.logos.retrieve("NASDAQ:AAPL")) == b"RIFFlogo"
+    assert len(route.calls) == 3
+    assert sleeps == [3, 1]
+
+
+@respx.mock
+def test_streamed_responses_stop_after_max_retries(sleeps: list) -> None:
+    route = respx.get(f"{BASE}/v3.0.0/company/logo/NASDAQ:AAPL").mock(
+        return_value=httpx.Response(429, headers={"Retry-After": "0"}, json=error(429, "rate_limited").json())
+    )
+    client = Roicai(api_key="test_key", max_retries=1)
+    with pytest.raises(TooManyRequestsError):
+        b"".join(client.companies.logos.retrieve("NASDAQ:AAPL"))
+    assert len(route.calls) == 2
+
+
+@respx.mock
+async def test_async_streamed_responses_are_retried(sleeps: list) -> None:
+    route = respx.get(f"{BASE}/v3.0.0/company/logo/NASDAQ:AAPL").mock(
+        side_effect=[httpx.Response(500, headers={"Retry-After": "2"}), httpx.Response(200, content=b"RIFF")]
+    )
+    client = AsyncRoicai(api_key="test_key", max_retries=2, httpx_client=httpx.AsyncClient())
+    chunks = [chunk async for chunk in client.companies.logos.retrieve("NASDAQ:AAPL")]
+    assert b"".join(chunks) == b"RIFF"
+    assert len(route.calls) == 2
+    assert sleeps == [2]
+
+
+def test_model_dump_honours_include_and_exclude() -> None:
+    from roicai import CompanyProfileEarningsSchedule, IncomeStatementFinancialPeriod
+
+    row = IncomeStatementFinancialPeriod.model_validate(statement(2025))
+    assert row.model_dump(include={"id", "fiscal_year"}) == {"id": "fnd_2025", "fiscal_year": 2025}
+    assert "fiscal_year" not in row.model_dump(exclude={"fiscal_year"})
+    assert "fiscal_year" not in row.model_dump_json(exclude={"fiscal_year"})
+    assert row.model_dump_json(include={"id", "symbol"}) == '{"id":"fnd_2025","symbol":"NASDAQ:AAPL"}'
+    assert '"period_end_date":"2025-09-30"' in row.model_dump_json()
+    profile_time = CompanyProfileEarningsSchedule.model_validate({"last_release_time": "2026-07-30T20:33:00Z"})
+    assert '"last_release_time":"2026-07-30T20:33:00Z"' in profile_time.model_dump_json()
+
+
+@respx.mock
+async def test_async_token_needs_no_api_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("ROICAI_API_KEY", raising=False)
+    route = respx.get(STATEMENTS).mock(return_value=httpx.Response(200, json=page([])))
+
+    async def token() -> str:
+        return "fresh_token"
+
+    client = AsyncRoicai(async_token=token, httpx_client=httpx.AsyncClient())
+    await client.fundamentals.income_statements.list("NASDAQ:AAPL")
+    assert route.calls.last.request.headers["authorization"] == "Bearer fresh_token"
+    with pytest.raises(ApiError, match="ROICAI_API_KEY"):
+        AsyncRoicai()
+
+
+def test_an_empty_api_key_is_a_missing_one(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("ROICAI_API_KEY", "")
+    with pytest.raises(ApiError, match="No API key"):
+        Roicai()
+    with pytest.raises(ApiError, match="No API key"):
+        AsyncRoicai(api_key="")
+
+
+def test_every_group_resolves() -> None:
+    def walk(group: object, depth: int = 0) -> int:
+        found = 0
+        for name, value in vars(type(group)).items():
+            if isinstance(value, property) and not name.startswith("_") and name != "with_raw_response":
+                found += 1 + walk(getattr(group, name), depth + 1)
+        return found
+
+    assert walk(Roicai(api_key="k")) >= 30
+    assert walk(AsyncRoicai(api_key="k")) >= 30
+
+
+def test_clients_close() -> None:
+    with Roicai(api_key="k") as client:
+        pass
+    assert client._client_wrapper.httpx_client.httpx_client.is_closed
+
+
+async def test_async_clients_close() -> None:
+    async with AsyncRoicai(api_key="k", httpx_client=httpx.AsyncClient()) as client:
+        pass
+    assert client._client_wrapper.httpx_client.httpx_client.is_closed
+
+
+@respx.mock
+def test_path_parameters_are_percent_encoded(client: Roicai) -> None:
+    route = respx.get(url__regex=rf"{BASE}/v3\.0\.0/tickers/.*").mock(return_value=error(404, "resource_missing"))
+    with pytest.raises(NotFoundError):
+        client.tickers.retrieve("NYSE:BRK/B?x=1#f")
+    assert route.calls.last.request.url.raw_path == b"/v3.0.0/tickers/NYSE%3ABRK%2FB%3Fx%3D1%23f"
+
+
+@respx.mock
+def test_an_error_body_that_is_not_the_api_error_keeps_its_class(client: Roicai) -> None:
+    from roicai import ServiceUnavailableError
+
+    respx.get(f"{BASE}/v3.0.0/tickers/A").mock(
+        side_effect=[
+            httpx.Response(503, text="<html>Bad gateway</html>"),
+            httpx.Response(429, json={"message": "Too Many Requests"}),
+            httpx.Response(404),
+        ]
+    )
+    with pytest.raises(ServiceUnavailableError) as unavailable:
+        client.tickers.retrieve("A")
+    assert unavailable.value.body == "<html>Bad gateway</html>"
+    with pytest.raises(TooManyRequestsError) as limited:
+        client.tickers.retrieve("A")
+    assert limited.value.body == {"message": "Too Many Requests"}
+    with pytest.raises(NotFoundError):
+        client.tickers.retrieve("A")
+
+
+@respx.mock
+def test_errors_pickle_and_copy(client: Roicai) -> None:
+    import copy
+    import pickle
+
+    respx.get(f"{BASE}/v3.0.0/tickers/A").mock(return_value=error(404, "resource_missing"))
+    with pytest.raises(NotFoundError) as raised:
+        client.tickers.retrieve("A")
+    for clone in (pickle.loads(pickle.dumps(raised.value)), copy.copy(raised.value), copy.deepcopy(raised.value)):
+        assert type(clone) is NotFoundError
+        assert (clone.status_code, clone.code, clone.request_id) == (404, "resource_missing", "req_123")
+    assert repr(raised.value) == (
+        "NotFoundError(status_code=404, message='Something went wrong.', code='resource_missing', request_id='req_123')"
+    )
+
+
+@respx.mock
+def test_max_items_must_be_a_positive_int(client: Roicai) -> None:
+    respx.get(STATEMENTS).mock(return_value=httpx.Response(200, json=page([])))
+    pager = client.fundamentals.income_statements.list("NASDAQ:AAPL")
+    for bad in (True, 0, -1, 2.5):
+        with pytest.raises(ValueError):
+            pager.to_pandas(max_items=bad)  # type: ignore[arg-type]
+
+
+def test_importing_adds_no_log_handler() -> None:
+    import subprocess
+
+    code = "import logging, roicai; roicai.Roicai(api_key='k'); print(len(logging.getLogger('roicai').handlers))"
+    assert subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True).stdout == "0\n"

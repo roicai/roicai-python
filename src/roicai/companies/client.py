@@ -33,7 +33,7 @@ class CompaniesClient:
         return self._raw_client
 
     @property
-    def profiles(self):
+    def profiles(self) -> ProfilesClient:
         if self._profiles is None:
             from .profiles.client import ProfilesClient  # noqa: E402
 
@@ -41,7 +41,7 @@ class CompaniesClient:
         return self._profiles
 
     @property
-    def employees(self):
+    def employees(self) -> EmployeesClient:
         if self._employees is None:
             from .employees.client import EmployeesClient  # noqa: E402
 
@@ -49,7 +49,7 @@ class CompaniesClient:
         return self._employees
 
     @property
-    def logos(self):
+    def logos(self) -> LogosClient:
         if self._logos is None:
             from .logos.client import LogosClient  # noqa: E402
 
@@ -77,7 +77,7 @@ class AsyncCompaniesClient:
         return self._raw_client
 
     @property
-    def profiles(self):
+    def profiles(self) -> AsyncProfilesClient:
         if self._profiles is None:
             from .profiles.client import AsyncProfilesClient  # noqa: E402
 
@@ -85,7 +85,7 @@ class AsyncCompaniesClient:
         return self._profiles
 
     @property
-    def employees(self):
+    def employees(self) -> AsyncEmployeesClient:
         if self._employees is None:
             from .employees.client import AsyncEmployeesClient  # noqa: E402
 
@@ -93,7 +93,7 @@ class AsyncCompaniesClient:
         return self._employees
 
     @property
-    def logos(self):
+    def logos(self) -> AsyncLogosClient:
         if self._logos is None:
             from .logos.client import AsyncLogosClient  # noqa: E402
 

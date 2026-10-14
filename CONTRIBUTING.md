@@ -13,7 +13,7 @@ These files are written by hand, and generation keeps them:
 | `src/roicai/_version.py` | The package version, read by `pyproject.toml`, and the `User-Agent`. |
 | `src/roicai/_paging.py` | Takes the `page` token from a response's `next_page_url`, so list methods request the next page with the same filters. |
 | `src/roicai/_dataframe.py` | `to_pandas()` and `to_polars()` on every response and list. |
-| `src/roicai/_errors.py` | The API's error fields on `ApiError` (`message`, `code`, `request_id`...) and its message. |
+| `src/roicai/_errors.py` | The API's error fields on `ApiError` (`message`, `code`, `request_id`...), its message, pickling, and `error_body`, which keeps a non-JSON error body. |
 
 The rest of the repository is also hand-written: `pyproject.toml`, the tests in `tests/` (except `tests/generated`), the scripts and this documentation.
 
@@ -42,7 +42,7 @@ The script saves the API's document as `openapi.json`, then:
 
 1. `scripts/prep_spec.py` writes the document Fern reads. It keeps the v3 operations, drops the `apikey` query parameter (the SDK sends the key as a bearer token), nests the dotted group names, adds Fern's pagination settings, and replaces the API's inlined objects with its named schemas, so types are `Ticker` rather than `V3TickerListDataItem`. It also turns numbers that the API's validator accepts as strings into plain numbers, and dates in responses into `datetime.date`.
 2. Fern generates the package at the versions pinned in `fern/` (the CLI in `fern.config.json`, the Python generator in `generators.yml`).
-3. `scripts/patch_generated.py` makes a few small changes to the generated code, such as using `_paging.py` and adding the mixins from `_dataframe.py` and `_errors.py`. Each patch fails if the code it changes is missing, so a Fern upgrade can't drop one silently.
+3. `scripts/patch_generated.py` makes small changes to the generated code, listed at the top of the script: for example, it uses `_paging.py`, adds the mixins from `_dataframe.py` and `_errors.py`, retries streamed responses and adds `close()`. Each patch fails if the code it changes is missing, so a Fern upgrade can't drop one silently.
 4. The script replaces `src/roicai` with the result, keeping the hand-written files, and updates `reference.md` and `tests/generated`.
 
 The **Codegen** workflow does this after every API deploy and opens a pull request when the SDK changed. Review the `openapi.json` diff in that pull request: a removed or renamed method, group or field is a breaking change (see [Releasing](#releasing)).

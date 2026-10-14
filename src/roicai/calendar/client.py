@@ -29,7 +29,7 @@ class CalendarClient:
         return self._raw_client
 
     @property
-    def earnings(self):
+    def earnings(self) -> EarningsClient:
         if self._earnings is None:
             from .earnings.client import EarningsClient  # noqa: E402
 
@@ -55,7 +55,7 @@ class AsyncCalendarClient:
         return self._raw_client
 
     @property
-    def earnings(self):
+    def earnings(self) -> AsyncEarningsClient:
         if self._earnings is None:
             from .earnings.client import AsyncEarningsClient  # noqa: E402
 

@@ -104,7 +104,7 @@ class Roicai:
         _defaulted_timeout = timeout if timeout is not None else 60 if httpx_client is None else None
         _defaulted_max_retries = max_retries if max_retries is not None else 2
         api_key = api_key if api_key is not None else os.getenv("ROICAI_API_KEY")
-        if api_key is None:
+        if not api_key:
             raise ApiError(
                 body="No API key: pass api_key to the client, or set the ROICAI_API_KEY environment variable. Get a key at https://roic.ai/api"
             )
@@ -141,8 +141,18 @@ class Roicai:
         self._documents: typing.Optional[DocumentsClient] = None
         self._fundamentals: typing.Optional[FundamentalsClient] = None
 
+    def close(self) -> None:
+        """Closes the HTTP client and its connections."""
+        self._client_wrapper.httpx_client.httpx_client.close()
+
+    def __enter__(self) -> "Roicai":
+        return self
+
+    def __exit__(self, *exc_info: typing.Any) -> None:
+        self.close()
+
     @property
-    def exchanges(self):
+    def exchanges(self) -> ExchangesClient:
         if self._exchanges is None:
             from .exchanges.client import ExchangesClient  # noqa: E402
 
@@ -150,7 +160,7 @@ class Roicai:
         return self._exchanges
 
     @property
-    def markets(self):
+    def markets(self) -> MarketsClient:
         if self._markets is None:
             from .markets.client import MarketsClient  # noqa: E402
 
@@ -158,7 +168,7 @@ class Roicai:
         return self._markets
 
     @property
-    def sectors(self):
+    def sectors(self) -> SectorsClient:
         if self._sectors is None:
             from .sectors.client import SectorsClient  # noqa: E402
 
@@ -166,7 +176,7 @@ class Roicai:
         return self._sectors
 
     @property
-    def industries(self):
+    def industries(self) -> IndustriesClient:
         if self._industries is None:
             from .industries.client import IndustriesClient  # noqa: E402
 
@@ -174,7 +184,7 @@ class Roicai:
         return self._industries
 
     @property
-    def countries(self):
+    def countries(self) -> CountriesClient:
         if self._countries is None:
             from .countries.client import CountriesClient  # noqa: E402
 
@@ -182,7 +192,7 @@ class Roicai:
         return self._countries
 
     @property
-    def tickers(self):
+    def tickers(self) -> TickersClient:
         if self._tickers is None:
             from .tickers.client import TickersClient  # noqa: E402
 
@@ -190,7 +200,7 @@ class Roicai:
         return self._tickers
 
     @property
-    def stock_splits(self):
+    def stock_splits(self) -> StockSplitsClient:
         if self._stock_splits is None:
             from .stock_splits.client import StockSplitsClient  # noqa: E402
 
@@ -198,7 +208,7 @@ class Roicai:
         return self._stock_splits
 
     @property
-    def stock_prices(self):
+    def stock_prices(self) -> StockPricesClient:
         if self._stock_prices is None:
             from .stock_prices.client import StockPricesClient  # noqa: E402
 
@@ -206,7 +216,7 @@ class Roicai:
         return self._stock_prices
 
     @property
-    def forex_pairs(self):
+    def forex_pairs(self) -> ForexPairsClient:
         if self._forex_pairs is None:
             from .forex_pairs.client import ForexPairsClient  # noqa: E402
 
@@ -214,7 +224,7 @@ class Roicai:
         return self._forex_pairs
 
     @property
-    def forex_prices(self):
+    def forex_prices(self) -> ForexPricesClient:
         if self._forex_prices is None:
             from .forex_prices.client import ForexPricesClient  # noqa: E402
 
@@ -222,7 +232,7 @@ class Roicai:
         return self._forex_prices
 
     @property
-    def earnings_calls(self):
+    def earnings_calls(self) -> EarningsCallsClient:
         if self._earnings_calls is None:
             from .earnings_calls.client import EarningsCallsClient  # noqa: E402
 
@@ -230,7 +240,7 @@ class Roicai:
         return self._earnings_calls
 
     @property
-    def company_events(self):
+    def company_events(self) -> CompanyEventsClient:
         if self._company_events is None:
             from .company_events.client import CompanyEventsClient  # noqa: E402
 
@@ -238,7 +248,7 @@ class Roicai:
         return self._company_events
 
     @property
-    def calendar(self):
+    def calendar(self) -> CalendarClient:
         if self._calendar is None:
             from .calendar.client import CalendarClient  # noqa: E402
 
@@ -246,7 +256,7 @@ class Roicai:
         return self._calendar
 
     @property
-    def companies(self):
+    def companies(self) -> CompaniesClient:
         if self._companies is None:
             from .companies.client import CompaniesClient  # noqa: E402
 
@@ -254,7 +264,7 @@ class Roicai:
         return self._companies
 
     @property
-    def documents(self):
+    def documents(self) -> DocumentsClient:
         if self._documents is None:
             from .documents.client import DocumentsClient  # noqa: E402
 
@@ -262,7 +272,7 @@ class Roicai:
         return self._documents
 
     @property
-    def fundamentals(self):
+    def fundamentals(self) -> FundamentalsClient:
         if self._fundamentals is None:
             from .fundamentals.client import FundamentalsClient  # noqa: E402
 
@@ -366,13 +376,13 @@ class AsyncRoicai:
         _defaulted_timeout = timeout if timeout is not None else 60 if httpx_client is None else None
         _defaulted_max_retries = max_retries if max_retries is not None else 2
         api_key = api_key if api_key is not None else os.getenv("ROICAI_API_KEY")
-        if api_key is None:
+        if not api_key and async_token is None:
             raise ApiError(
                 body="No API key: pass api_key to the client, or set the ROICAI_API_KEY environment variable. Get a key at https://roic.ai/api"
             )
         self._client_wrapper = AsyncClientWrapper(
             base_url=_get_base_url(base_url=base_url, environment=environment),
-            api_key=api_key,
+            api_key=api_key or "",
             headers=headers,
             app_info=app_info,
             async_token=async_token,
@@ -402,8 +412,18 @@ class AsyncRoicai:
         self._documents: typing.Optional[AsyncDocumentsClient] = None
         self._fundamentals: typing.Optional[AsyncFundamentalsClient] = None
 
+    async def aclose(self) -> None:
+        """Closes the HTTP client and its connections."""
+        await self._client_wrapper.httpx_client.httpx_client.aclose()
+
+    async def __aenter__(self) -> "AsyncRoicai":
+        return self
+
+    async def __aexit__(self, *exc_info: typing.Any) -> None:
+        await self.aclose()
+
     @property
-    def exchanges(self):
+    def exchanges(self) -> AsyncExchangesClient:
         if self._exchanges is None:
             from .exchanges.client import AsyncExchangesClient  # noqa: E402
 
@@ -411,7 +431,7 @@ class AsyncRoicai:
         return self._exchanges
 
     @property
-    def markets(self):
+    def markets(self) -> AsyncMarketsClient:
         if self._markets is None:
             from .markets.client import AsyncMarketsClient  # noqa: E402
 
@@ -419,7 +439,7 @@ class AsyncRoicai:
         return self._markets
 
     @property
-    def sectors(self):
+    def sectors(self) -> AsyncSectorsClient:
         if self._sectors is None:
             from .sectors.client import AsyncSectorsClient  # noqa: E402
 
@@ -427,7 +447,7 @@ class AsyncRoicai:
         return self._sectors
 
     @property
-    def industries(self):
+    def industries(self) -> AsyncIndustriesClient:
         if self._industries is None:
             from .industries.client import AsyncIndustriesClient  # noqa: E402
 
@@ -435,7 +455,7 @@ class AsyncRoicai:
         return self._industries
 
     @property
-    def countries(self):
+    def countries(self) -> AsyncCountriesClient:
         if self._countries is None:
             from .countries.client import AsyncCountriesClient  # noqa: E402
 
@@ -443,7 +463,7 @@ class AsyncRoicai:
         return self._countries
 
     @property
-    def tickers(self):
+    def tickers(self) -> AsyncTickersClient:
         if self._tickers is None:
             from .tickers.client import AsyncTickersClient  # noqa: E402
 
@@ -451,7 +471,7 @@ class AsyncRoicai:
         return self._tickers
 
     @property
-    def stock_splits(self):
+    def stock_splits(self) -> AsyncStockSplitsClient:
         if self._stock_splits is None:
             from .stock_splits.client import AsyncStockSplitsClient  # noqa: E402
 
@@ -459,7 +479,7 @@ class AsyncRoicai:
         return self._stock_splits
 
     @property
-    def stock_prices(self):
+    def stock_prices(self) -> AsyncStockPricesClient:
         if self._stock_prices is None:
             from .stock_prices.client import AsyncStockPricesClient  # noqa: E402
 
@@ -467,7 +487,7 @@ class AsyncRoicai:
         return self._stock_prices
 
     @property
-    def forex_pairs(self):
+    def forex_pairs(self) -> AsyncForexPairsClient:
         if self._forex_pairs is None:
             from .forex_pairs.client import AsyncForexPairsClient  # noqa: E402
 
@@ -475,7 +495,7 @@ class AsyncRoicai:
         return self._forex_pairs
 
     @property
-    def forex_prices(self):
+    def forex_prices(self) -> AsyncForexPricesClient:
         if self._forex_prices is None:
             from .forex_prices.client import AsyncForexPricesClient  # noqa: E402
 
@@ -483,7 +503,7 @@ class AsyncRoicai:
         return self._forex_prices
 
     @property
-    def earnings_calls(self):
+    def earnings_calls(self) -> AsyncEarningsCallsClient:
         if self._earnings_calls is None:
             from .earnings_calls.client import AsyncEarningsCallsClient  # noqa: E402
 
@@ -491,7 +511,7 @@ class AsyncRoicai:
         return self._earnings_calls
 
     @property
-    def company_events(self):
+    def company_events(self) -> AsyncCompanyEventsClient:
         if self._company_events is None:
             from .company_events.client import AsyncCompanyEventsClient  # noqa: E402
 
@@ -499,7 +519,7 @@ class AsyncRoicai:
         return self._company_events
 
     @property
-    def calendar(self):
+    def calendar(self) -> AsyncCalendarClient:
         if self._calendar is None:
             from .calendar.client import AsyncCalendarClient  # noqa: E402
 
@@ -507,7 +527,7 @@ class AsyncRoicai:
         return self._calendar
 
     @property
-    def companies(self):
+    def companies(self) -> AsyncCompaniesClient:
         if self._companies is None:
             from .companies.client import AsyncCompaniesClient  # noqa: E402
 
@@ -515,7 +535,7 @@ class AsyncRoicai:
         return self._companies
 
     @property
-    def documents(self):
+    def documents(self) -> AsyncDocumentsClient:
         if self._documents is None:
             from .documents.client import AsyncDocumentsClient  # noqa: E402
 
@@ -523,7 +543,7 @@ class AsyncRoicai:
         return self._documents
 
     @property
-    def fundamentals(self):
+    def fundamentals(self) -> AsyncFundamentalsClient:
         if self._fundamentals is None:
             from .fundamentals.client import AsyncFundamentalsClient  # noqa: E402
 

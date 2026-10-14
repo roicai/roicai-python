@@ -31,7 +31,7 @@ class TranscriptsClient:
         return self._raw_client
 
     @property
-    def raw(self):
+    def raw(self) -> RawClient:
         if self._raw is None:
             from .raw.client import RawClient  # noqa: E402
 
@@ -39,7 +39,7 @@ class TranscriptsClient:
         return self._raw
 
     @property
-    def edited(self):
+    def edited(self) -> EditedClient:
         if self._edited is None:
             from .edited.client import EditedClient  # noqa: E402
 
@@ -66,7 +66,7 @@ class AsyncTranscriptsClient:
         return self._raw_client
 
     @property
-    def raw(self):
+    def raw(self) -> AsyncRawClient:
         if self._raw is None:
             from .raw.client import AsyncRawClient  # noqa: E402
 
@@ -74,7 +74,7 @@ class AsyncTranscriptsClient:
         return self._raw
 
     @property
-    def edited(self):
+    def edited(self) -> AsyncEditedClient:
         if self._edited is None:
             from .edited.client import AsyncEditedClient  # noqa: E402
 

@@ -43,7 +43,7 @@ class FundamentalsClient:
         return self._raw_client
 
     @property
-    def income_statements(self):
+    def income_statements(self) -> IncomeStatementsClient:
         if self._income_statements is None:
             from .income_statements.client import IncomeStatementsClient  # noqa: E402
 
@@ -51,7 +51,7 @@ class FundamentalsClient:
         return self._income_statements
 
     @property
-    def balance_sheets(self):
+    def balance_sheets(self) -> BalanceSheetsClient:
         if self._balance_sheets is None:
             from .balance_sheets.client import BalanceSheetsClient  # noqa: E402
 
@@ -59,7 +59,7 @@ class FundamentalsClient:
         return self._balance_sheets
 
     @property
-    def cash_flow_statements(self):
+    def cash_flow_statements(self) -> CashFlowStatementsClient:
         if self._cash_flow_statements is None:
             from .cash_flow_statements.client import CashFlowStatementsClient  # noqa: E402
 
@@ -67,7 +67,7 @@ class FundamentalsClient:
         return self._cash_flow_statements
 
     @property
-    def enterprise_values(self):
+    def enterprise_values(self) -> EnterpriseValuesClient:
         if self._enterprise_values is None:
             from .enterprise_values.client import EnterpriseValuesClient  # noqa: E402
 
@@ -75,7 +75,7 @@ class FundamentalsClient:
         return self._enterprise_values
 
     @property
-    def multiples(self):
+    def multiples(self) -> MultiplesClient:
         if self._multiples is None:
             from .multiples.client import MultiplesClient  # noqa: E402
 
@@ -83,7 +83,7 @@ class FundamentalsClient:
         return self._multiples
 
     @property
-    def per_share_metrics(self):
+    def per_share_metrics(self) -> PerShareMetricsClient:
         if self._per_share_metrics is None:
             from .per_share_metrics.client import PerShareMetricsClient  # noqa: E402
 
@@ -91,7 +91,7 @@ class FundamentalsClient:
         return self._per_share_metrics
 
     @property
-    def bulk(self):
+    def bulk(self) -> BulkClient:
         if self._bulk is None:
             from .bulk.client import BulkClient  # noqa: E402
 
@@ -99,7 +99,7 @@ class FundamentalsClient:
         return self._bulk
 
     @property
-    def ratios(self):
+    def ratios(self) -> RatiosClient:
         if self._ratios is None:
             from .ratios.client import RatiosClient  # noqa: E402
 
@@ -132,7 +132,7 @@ class AsyncFundamentalsClient:
         return self._raw_client
 
     @property
-    def income_statements(self):
+    def income_statements(self) -> AsyncIncomeStatementsClient:
         if self._income_statements is None:
             from .income_statements.client import AsyncIncomeStatementsClient  # noqa: E402
 
@@ -140,7 +140,7 @@ class AsyncFundamentalsClient:
         return self._income_statements
 
     @property
-    def balance_sheets(self):
+    def balance_sheets(self) -> AsyncBalanceSheetsClient:
         if self._balance_sheets is None:
             from .balance_sheets.client import AsyncBalanceSheetsClient  # noqa: E402
 
@@ -148,7 +148,7 @@ class AsyncFundamentalsClient:
         return self._balance_sheets
 
     @property
-    def cash_flow_statements(self):
+    def cash_flow_statements(self) -> AsyncCashFlowStatementsClient:
         if self._cash_flow_statements is None:
             from .cash_flow_statements.client import AsyncCashFlowStatementsClient  # noqa: E402
 
@@ -156,7 +156,7 @@ class AsyncFundamentalsClient:
         return self._cash_flow_statements
 
     @property
-    def enterprise_values(self):
+    def enterprise_values(self) -> AsyncEnterpriseValuesClient:
         if self._enterprise_values is None:
             from .enterprise_values.client import AsyncEnterpriseValuesClient  # noqa: E402
 
@@ -164,7 +164,7 @@ class AsyncFundamentalsClient:
         return self._enterprise_values
 
     @property
-    def multiples(self):
+    def multiples(self) -> AsyncMultiplesClient:
         if self._multiples is None:
             from .multiples.client import AsyncMultiplesClient  # noqa: E402
 
@@ -172,7 +172,7 @@ class AsyncFundamentalsClient:
         return self._multiples
 
     @property
-    def per_share_metrics(self):
+    def per_share_metrics(self) -> AsyncPerShareMetricsClient:
         if self._per_share_metrics is None:
             from .per_share_metrics.client import AsyncPerShareMetricsClient  # noqa: E402
 
@@ -180,7 +180,7 @@ class AsyncFundamentalsClient:
         return self._per_share_metrics
 
     @property
-    def bulk(self):
+    def bulk(self) -> AsyncBulkClient:
         if self._bulk is None:
             from .bulk.client import AsyncBulkClient  # noqa: E402
 
@@ -188,7 +188,7 @@ class AsyncFundamentalsClient:
         return self._bulk
 
     @property
-    def ratios(self):
+    def ratios(self) -> AsyncRatiosClient:
         if self._ratios is None:
             from .ratios.client import AsyncRatiosClient  # noqa: E402
 

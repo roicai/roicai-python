@@ -167,12 +167,15 @@ if typing.TYPE_CHECKING:
     from .client import AsyncRoicai, Roicai
     from .company_events import ListCompanyEventsRequestContent
     from .core.api_error import ApiError
+    from .core.pagination import AsyncPager, SyncPager
+    from .core.request_options import RequestOptions
     from .earnings_calls import RetrieveEarningsCallsRequestFormat
     from .environment import RoicaiEnvironment
     from .stock_prices import ListStockPricesRequestAdjusted, ListStockPricesRequestAdjustment
     from .tickers import SearchTickersRequestSearchBy
 _dynamic_imports: typing.Dict[str, str] = {
     "ApiError": ".core.api_error",
+    "AsyncPager": ".core.pagination",
     "AsyncRoicai": ".client",
     "AudioDownload": ".types",
     "AudioDownloadDocumentGroup": ".types",
@@ -284,6 +287,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "ProfitabilityFinancialPeriod": ".types",
     "ProfitabilityFinancialPeriodList": ".types",
     "ProfitabilityFinancialPeriodObject": ".types",
+    "RequestOptions": ".core.request_options",
     "RetrieveEarningsCallsRequestFormat": ".earnings_calls",
     "Roicai": ".client",
     "RoicaiEnvironment": ".environment",
@@ -296,6 +300,7 @@ _dynamic_imports: typing.Dict[str, str] = {
     "StockSplit": ".types",
     "StockSplitList": ".types",
     "StockSplitObject": ".types",
+    "SyncPager": ".core.pagination",
     "Ticker": ".types",
     "TickerList": ".types",
     "TickerObject": ".types",
@@ -360,6 +365,7 @@ def __dir__():
 
 __all__ = [
     "ApiError",
+    "AsyncPager",
     "AsyncRoicai",
     "AudioDownload",
     "AudioDownloadDocumentGroup",
@@ -471,6 +477,7 @@ __all__ = [
     "ProfitabilityFinancialPeriod",
     "ProfitabilityFinancialPeriodList",
     "ProfitabilityFinancialPeriodObject",
+    "RequestOptions",
     "RetrieveEarningsCallsRequestFormat",
     "Roicai",
     "RoicaiEnvironment",
@@ -483,6 +490,7 @@ __all__ = [
     "StockSplit",
     "StockSplitList",
     "StockSplitObject",
+    "SyncPager",
     "Ticker",
     "TickerList",
     "TickerObject",

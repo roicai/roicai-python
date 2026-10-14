@@ -61,7 +61,7 @@ class ForexPairsClient:
             Maximum number of resources to return. Defaults to 500.
 
         page : typing.Optional[str]
-            Opaque page token from a previous response. Prefer following the returned page URLs directly.
+            Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -152,7 +152,7 @@ class AsyncForexPairsClient:
             Maximum number of resources to return. Defaults to 500.
 
         page : typing.Optional[str]
-            Opaque page token from a previous response. Prefer following the returned page URLs directly.
+            Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
