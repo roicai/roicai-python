@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: ${{ matrix.python }}
+      - run: uv sync --locked --all-extras
+      # The live tests, which include every README example, run when the
+      # secret is available: not on pull requests from forks.
+      - run: uv run pytest
+        env:
+          ROICAI_API_KEY: ${{ secrets.ROICAI_API_KEY }}
+
+  lowest:
+    name: lowest supported dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: "3.10"
+      - run: uv run --resolution lowest-direct --isolated --all-extras pytest tests/test_client.py
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v10.2.0
+      - run: uv sync --locked --all-extras
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy
+      - run: uv run pyright
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v10.2.0
+      - run: uv build
+      - run: uvx twine check --strict dist/*
+
+  generated:
+    name: generated code matches openapi.json
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: scripts/generate.sh --committed
+      - name: Fail if src/roicai was edited by hand or not regenerated
+        run: git diff --exit-code && test -z "$(git status --porcelain)"

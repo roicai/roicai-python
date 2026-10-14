@@ -1,0 +1,128 @@
+[project]
+name = "roicai"
+dynamic = ["version"]
+description = "Official Python SDK for the ROIC.ai financial data and stock API: fundamentals, earnings call transcripts, stock prices"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "ROIC.ai" }]
+requires-python = ">=3.10"
+dependencies = [
+  "httpx>=0.21.2",
+  "pydantic>=2.1",
+  "typing_extensions>=4.0.0",
+]
+keywords = [
+  "roic",
+  "roicai",
+  "financial data api",
+  "stock api",
+  "stock market data",
+  "fundamentals",
+  "financial statements",
+  "earnings call transcripts",
+  "stock prices",
+  "sec filings",
+  "market data",
+  "pandas",
+  "polars",
+  "finance",
+  "investing",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Office/Business :: Financial :: Investment",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed",
+]
+
+[project.optional-dependencies]
+pandas = ["pandas>=2.2.2"]
+polars = ["polars>=1.0"]
+aiohttp = ["aiohttp>=3.10.0,<4", "httpx-aiohttp>=0.1.8"]
+
+[project.urls]
+Homepage = "https://roic.ai"
+Documentation = "https://roic.ai/api"
+Repository = "https://github.com/roicai/roicai-python"
+Issues = "https://github.com/roicai/roicai-python/issues"
+Changelog = "https://github.com/roicai/roicai-python/releases"
+
+[dependency-groups]
+dev = [
+  "pytest>=8",
+  "pytest-asyncio>=0.24",
+  "respx>=0.22",
+  "mypy>=1.13",
+  "pyright>=1.1.390",
+  "ruff>=0.8",
+  "pandas>=2.2.2",
+  "pandas-stubs>=2.0",
+  "polars>=1.0",
+]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/roicai/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/roicai"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/roicai", "tests", "README.md", "LICENSE", "reference.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+  "aiohttp: needs the aiohttp extra",
+  "live: calls the API; needs ROICAI_API_KEY",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+# The generated code is formatted by Fern; only the hand-written files are linted.
+extend-exclude = [
+  "src/roicai/[!_]*",
+  "src/roicai/__init__.py",
+  "src/roicai/_default_clients.py",
+  "tests/generated",
+  "reference.md",
+]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B"]
+per-file-ignores = { "tests/test_types.py" = ["F841"] }
+
+[tool.mypy]
+files = ["src/roicai", "tests/test_types.py"]
+python_version = "3.10"
+strict = false
+check_untyped_defs = true
+
+[tool.pyright]
+# Fern's generated code doesn't pass pyright's strictest checks, so only the
+# hand-written files and the type tests are checked; mypy checks everything.
+include = [
+  "src/roicai/_dataframe.py",
+  "src/roicai/_errors.py",
+  "src/roicai/_paging.py",
+  "src/roicai/_version.py",
+  "tests/test_types.py",
+]
+pythonVersion = "3.10"

@@ -1,0 +1,9 @@
+src/roicai/** linguist-generated=true
+src/roicai/_dataframe.py linguist-generated=false
+src/roicai/_errors.py linguist-generated=false
+src/roicai/_paging.py linguist-generated=false
+src/roicai/_version.py linguist-generated=false
+tests/generated/** linguist-generated=true
+reference.md linguist-generated=true
+openapi.json linguist-generated=true
+uv.lock linguist-generated=true

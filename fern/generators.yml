@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://schema.buildwithfern.dev/generators-yml.json
+# scripts/generate.sh writes build/openapi.sdk.json and runs this with
+# `fern generate --local`, which runs the generator in Docker without a Fern
+# account. Pin both versions: change them in a pull request of their own and
+# review the diff they make.
+api:
+  specs:
+    - openapi: ../build/openapi.sdk.json
+default-group: local
+groups:
+  local:
+    generators:
+      - name: fernapi/fern-python-sdk
+        version: 5.41.2
+        output:
+          location: local-file-system
+          path: ../build/generated
+        config:
+          package_name: roicai
+          client:
+            class_name: Roicai
+          environment_class_name: RoicaiEnvironment
+          additional_init_exports:
+            - from: core.api_error
+              imports: [ApiError]
+            - from: _version
+              imports: [__version__]
+          pyproject_python_version: "^3.10"
+          user-agent: "roicai-python/{version}"
+          allow_user_agent_app_info: true
+          omit_fern_headers: true
+          runtime_version: true
+          pydantic_config:
+            version: v2
