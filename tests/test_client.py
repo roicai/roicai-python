@@ -198,6 +198,20 @@ def test_max_items_stops_and_warns(client: Roicai) -> None:
 
 
 @respx.mock
+def test_max_items_at_the_end_of_a_page_does_not_fetch_the_next(client: Roicai) -> None:
+    route = respx.get(STATEMENTS).mock(
+        side_effect=[
+            httpx.Response(200, json=page([statement(2025), statement(2024)], "tok2")),
+            httpx.Response(200, json=page([statement(2023)])),
+        ]
+    )
+    with pytest.warns(UserWarning, match="max_items=2"):
+        df = client.fundamentals.income_statements.list("NASDAQ:AAPL").to_pandas(max_items=2)
+    assert len(df) == 2
+    assert len(route.calls) == 1
+
+
+@respx.mock
 def test_max_items_equal_to_the_list_does_not_warn(client: Roicai) -> None:
     respx.get(STATEMENTS).mock(return_value=httpx.Response(200, json=page([statement(2025), statement(2024)])))
     with warnings.catch_warnings():

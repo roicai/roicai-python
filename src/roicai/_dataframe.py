@@ -126,23 +126,38 @@ def build_polars(items: list, row_model: typing.Any) -> polars.DataFrame:
 def _collect(pager: typing.Any, max_items: typing.Optional[int]) -> list:
     _check(max_items)
     items: list[typing.Any] = []
-    for item in pager:
-        if max_items is not None and len(items) == max_items:
-            _warn_truncated(max_items)
+    for page in pager.iter_pages():
+        if _take(items, page, max_items):
             break
-        items.append(item)
     return items
 
 
 async def _acollect(pager: typing.Any, max_items: typing.Optional[int]) -> list:
     _check(max_items)
     items: list[typing.Any] = []
-    async for item in pager:
-        if max_items is not None and len(items) == max_items:
-            _warn_truncated(max_items)
+    async for page in pager.iter_pages():
+        if _take(items, page, max_items):
             break
-        items.append(item)
     return items
+
+
+def _take(items: list, page: typing.Any, max_items: typing.Optional[int]) -> bool:
+    """Adds a page's items to `items`; returns True when max_items is reached.
+
+    Decides whether rows remain from the page itself, so reaching max_items at
+    the end of a page doesn't request the next page only to find out.
+    """
+    page_items = page.items or []
+    if max_items is None:
+        items.extend(page_items)
+        return False
+    room = max_items - len(items)
+    items.extend(page_items[:room])
+    if len(items) < max_items:
+        return False
+    if len(page_items) > room or page.has_next:
+        _warn_truncated(max_items)
+    return True
 
 
 def _check(max_items: typing.Optional[int]) -> None:
@@ -154,7 +169,7 @@ def _warn_truncated(max_items: int) -> None:
     warnings.warn(
         f"Stopped after max_items={max_items} rows; more pages remain. "
         "Pass a larger max_items, or max_items=None to fetch every page.",
-        stacklevel=4,
+        stacklevel=5,
     )
 
 
