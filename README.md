@@ -1,16 +1,16 @@
-# ROIC.ai Python Library
+# ROIC.AI Python Library
 
 [![PyPI](https://img.shields.io/pypi/v/roicai.svg)](https://pypi.org/project/roicai/)
 [![Python versions](https://img.shields.io/pypi/pyversions/roicai.svg)](https://pypi.org/project/roicai/)
 [![Build Status](https://github.com/roicai/roicai-python/actions/workflows/ci.yml/badge.svg)](https://github.com/roicai/roicai-python/actions/workflows/ci.yml)
 
-The ROIC.ai Python library is the official Python client for the [ROIC.ai](https://www.roic.ai) financial data API and stock API. Use it to get fundamentals for public companies, such as income statements, balance sheets, cash flow statements, financial ratios and valuation multiples, and earnings call transcripts. It also covers historical and latest stock prices, SEC filings and other company documents, the earnings calendar, company profiles and forex rates.
+The ROIC.AI Python library is the official Python client for the [ROIC.AI](https://www.roic.ai) financial data API and stock API. Use it to get fundamentals for public companies, such as income statements, balance sheets, cash flow statements, financial ratios and valuation multiples, and earnings call transcripts. It also covers historical and latest stock prices, SEC filings and other company documents, the earnings calendar, company profiles and forex rates.
 
 Responses are typed Pydantic models, list methods fetch the next pages for you, and any response converts to a pandas or polars DataFrame.
 
 ## Documentation
 
-See the [ROIC.ai API reference](https://api.roic.ai/v3.0.0/openapi) for every endpoint, parameter and field, and the [API guides](https://www.roic.ai/api) for authentication, plans and response formats. [reference.md](https://github.com/roicai/roicai-python/blob/main/reference.md) lists every method of this library with its parameters.
+See the [ROIC.AI API reference](https://api.roic.ai/v3.0.0/openapi) for every endpoint, parameter and field, and the [API guides](https://www.roic.ai/api) for authentication, plans and response formats. [reference.md](https://github.com/roicai/roicai-python/blob/main/reference.md) lists every method of this library with its parameters.
 
 ## Requirements
 
@@ -35,7 +35,7 @@ These are the same package; the part in brackets also installs pandas or polars.
 
 ## Usage
 
-The library needs your ROIC.ai API key, which you can find on the [authentication page](https://www.roic.ai/api/docs/authentication) once you sign in. Set it as the `ROICAI_API_KEY` environment variable, or pass it to the client:
+The library needs your ROIC.AI API key, which you can find on the [authentication page](https://www.roic.ai/api/docs/authentication) once you sign in. Set it as the `ROICAI_API_KEY` environment variable, or pass it to the client:
 
 ```python
 from roicai import Roicai
@@ -240,7 +240,7 @@ client = Roicai(
 | `timeout` | `60` | Seconds to wait for a response. With your own `httpx_client`, that client's timeout applies instead. |
 | `max_retries` | `2` | Retries for a request that fails with a `408`, `409`, `429` or `5xx` status. |
 | `headers` | | Headers sent with every request. |
-| `app_info` | | Your application's `name`, and optionally `version` and `comment`, added to the `User-Agent`. If you build a library or plugin on ROIC.ai, please set it. |
+| `app_info` | | Your application's `name`, and optionally `version` and `comment`, added to the `User-Agent`. If you build a library or plugin on ROIC.AI, please set it. |
 | `httpx_client` | | [The httpx client that sends requests.](#configuring-the-http-client) |
 
 ### Retries
@@ -476,7 +476,7 @@ to_usd = client.forex_prices.latest.list(quote_currency="USD")
 
 ## Support
 
-Report bugs and request features in [GitHub issues](https://github.com/roicai/roicai-python/issues). For questions about your account, plan or the data, contact ROIC.ai through [www.roic.ai](https://www.roic.ai).
+Report bugs and request features in [GitHub issues](https://github.com/roicai/roicai-python/issues). For questions about your account, plan or the data, contact ROIC.AI through [www.roic.ai](https://www.roic.ai).
 
 The library follows semver. While it is `0.x`, a minor version can include breaking changes, so pin the minor version you use.
 
