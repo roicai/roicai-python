@@ -2214,7 +2214,7 @@ client.documents.audio.retrieve(
 <dl>
 <dd>
 
-Returns the plain-text transcript of an earnings event, without speaker labels or line breaks, from a ready Quartr transcript when one exists, otherwise from the FMP transcript. Free plans can read each company’s latest two events; Individual plans follow the plan’s lookback; Professional and Enterprise plans read everything. Use the `trraw_` id from the event listing.
+Returns the plain-text transcript of an earnings event, without speaker labels or line breaks. Free plans can read each company’s latest two events; Individual plans follow the plan’s lookback; Professional and Enterprise plans read everything. Use the `trraw_` id from the event listing.
 </dd>
 </dl>
 </dd>
@@ -2288,7 +2288,7 @@ client.documents.transcripts.raw.retrieve(
 <dl>
 <dd>
 
-Returns the speaker-labelled transcript of an earnings event: ordered segments with a `speaker_id`, and a `speakers` map with each speaker’s name, role, and company where known. Quartr transcripts prefer the human-edited edition, then the aligned edition; FMP transcripts derive speakers from the turn names. Professional and Enterprise plans only. Use the `tredit_` id from the event listing.
+Returns the speaker-labelled transcript of an earnings event: ordered segments with a `speaker_id`, and a `speakers` map with each speaker’s name, role, and company where known. The human-edited edition is preferred when one exists. Professional and Enterprise plans only. Use the `tredit_` id from the event listing.
 </dd>
 </dl>
 </dd>
