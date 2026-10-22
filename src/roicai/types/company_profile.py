@@ -35,6 +35,7 @@ class CompanyProfile(UniversalBaseModel):
     name: typing.Optional[str] = None
     description: typing.Optional[str] = None
     short_description: typing.Optional[str] = None
+    ai_description: typing.Optional[str] = None
     sector: typing.Optional[str] = None
     industry: typing.Optional[str] = None
     fundamental_currency: typing.Optional[str] = None
