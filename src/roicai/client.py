@@ -24,6 +24,7 @@ if typing.TYPE_CHECKING:
     from .fundamentals.client import AsyncFundamentalsClient, FundamentalsClient
     from .industries.client import AsyncIndustriesClient, IndustriesClient
     from .markets.client import AsyncMarketsClient, MarketsClient
+    from .news.client import AsyncNewsClient, NewsClient
     from .sectors.client import AsyncSectorsClient, SectorsClient
     from .stock_prices.client import AsyncStockPricesClient, StockPricesClient
     from .stock_splits.client import AsyncStockSplitsClient, StockSplitsClient
@@ -135,6 +136,7 @@ class Roicai:
         self._forex_pairs: typing.Optional[ForexPairsClient] = None
         self._forex_prices: typing.Optional[ForexPricesClient] = None
         self._earnings_calls: typing.Optional[EarningsCallsClient] = None
+        self._news: typing.Optional[NewsClient] = None
         self._company_events: typing.Optional[CompanyEventsClient] = None
         self._calendar: typing.Optional[CalendarClient] = None
         self._companies: typing.Optional[CompaniesClient] = None
@@ -238,6 +240,14 @@ class Roicai:
 
             self._earnings_calls = EarningsCallsClient(client_wrapper=self._client_wrapper)
         return self._earnings_calls
+
+    @property
+    def news(self) -> NewsClient:
+        if self._news is None:
+            from .news.client import NewsClient  # noqa: E402
+
+            self._news = NewsClient(client_wrapper=self._client_wrapper)
+        return self._news
 
     @property
     def company_events(self) -> CompanyEventsClient:
@@ -406,6 +416,7 @@ class AsyncRoicai:
         self._forex_pairs: typing.Optional[AsyncForexPairsClient] = None
         self._forex_prices: typing.Optional[AsyncForexPricesClient] = None
         self._earnings_calls: typing.Optional[AsyncEarningsCallsClient] = None
+        self._news: typing.Optional[AsyncNewsClient] = None
         self._company_events: typing.Optional[AsyncCompanyEventsClient] = None
         self._calendar: typing.Optional[AsyncCalendarClient] = None
         self._companies: typing.Optional[AsyncCompaniesClient] = None
@@ -509,6 +520,14 @@ class AsyncRoicai:
 
             self._earnings_calls = AsyncEarningsCallsClient(client_wrapper=self._client_wrapper)
         return self._earnings_calls
+
+    @property
+    def news(self) -> AsyncNewsClient:
+        if self._news is None:
+            from .news.client import AsyncNewsClient  # noqa: E402
+
+            self._news = AsyncNewsClient(client_wrapper=self._client_wrapper)
+        return self._news
 
     @property
     def company_events(self) -> AsyncCompanyEventsClient:

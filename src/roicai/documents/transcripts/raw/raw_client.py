@@ -31,7 +31,7 @@ class RawRawClient:
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[TranscriptRaw]:
         """
-        Returns the plain-text transcript of an earnings event, without speaker labels or line breaks, from a ready Quartr transcript when one exists, otherwise from the FMP transcript. Free plans can read each company’s latest two events; Individual plans follow the plan’s lookback; Professional and Enterprise plans read everything. Use the `trraw_` id from the event listing.
+        Returns the plain-text transcript of an earnings event, without speaker labels or line breaks. Free plans can read each company’s latest two events; Individual plans follow the plan’s lookback; Professional and Enterprise plans read everything. Use the `trraw_` id from the event listing.
 
         Parameters
         ----------
@@ -114,7 +114,7 @@ class AsyncRawRawClient:
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[TranscriptRaw]:
         """
-        Returns the plain-text transcript of an earnings event, without speaker labels or line breaks, from a ready Quartr transcript when one exists, otherwise from the FMP transcript. Free plans can read each company’s latest two events; Individual plans follow the plan’s lookback; Professional and Enterprise plans read everything. Use the `trraw_` id from the event listing.
+        Returns the plain-text transcript of an earnings event, without speaker labels or line breaks. Free plans can read each company’s latest two events; Individual plans follow the plan’s lookback; Professional and Enterprise plans read everything. Use the `trraw_` id from the event listing.
 
         Parameters
         ----------

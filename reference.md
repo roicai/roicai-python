@@ -1425,6 +1425,124 @@ client.earnings_calls.retrieve(
 </dl>
 </details>
 
+## News
+<details><summary><code>client.news.<a href="src/roicai/news/client.py">list</a>(...) -> NewsArticleList</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns news articles from publishers and articles ROIC writes, newest first. Each article appears once, with every company it is about. History follows the plan's lookback limit. Filter by a `published_at` range.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from roicai import Roicai
+from roicai.environment import RoicaiEnvironment
+import datetime
+
+client = Roicai(
+    api_key="<token>",
+    environment=RoicaiEnvironment.DEFAULT,
+)
+
+client.news.list(
+    published_at_gte=datetime.datetime.fromisoformat("2026-11-11T14:37:34+00:00"),
+    published_at_gt=datetime.datetime.fromisoformat("2026-11-11T14:37:34+00:00"),
+    published_at_lte=datetime.datetime.fromisoformat("2026-11-11T14:37:34+00:00"),
+    published_at_lt=datetime.datetime.fromisoformat("2026-11-11T14:37:34+00:00"),
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**published_at_gte:** `typing.Optional[datetime.datetime]` — Return news published at or after this RFC 3339 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**published_at_gt:** `typing.Optional[datetime.datetime]` — Return news published after this RFC 3339 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**published_at_lte:** `typing.Optional[datetime.datetime]` — Return news published at or before this RFC 3339 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**published_at_lt:** `typing.Optional[datetime.datetime]` — Return news published before this RFC 3339 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**limit:** `typing.Optional[int]` — Maximum number of resources to return. Defaults to 25.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Company Events
 <details><summary><code>client.company_events.<a href="src/roicai/company_events/client.py">list</a>(...) -> CompanyEventList</code></summary>
 <dl>
@@ -2214,7 +2332,7 @@ client.documents.audio.retrieve(
 <dl>
 <dd>
 
-Returns the plain-text transcript of an earnings event, without speaker labels or line breaks, from a ready Quartr transcript when one exists, otherwise from the FMP transcript. Free plans can read each company’s latest two events; Individual plans follow the plan’s lookback; Professional and Enterprise plans read everything. Use the `trraw_` id from the event listing.
+Returns the plain-text transcript of an earnings event, without speaker labels or line breaks. Free plans can read each company’s latest two events; Individual plans follow the plan’s lookback; Professional and Enterprise plans read everything. Use the `trraw_` id from the event listing.
 </dd>
 </dl>
 </dd>
@@ -2288,7 +2406,7 @@ client.documents.transcripts.raw.retrieve(
 <dl>
 <dd>
 
-Returns the speaker-labelled transcript of an earnings event: ordered segments with a `speaker_id`, and a `speakers` map with each speaker’s name, role, and company where known. Quartr transcripts prefer the human-edited edition, then the aligned edition; FMP transcripts derive speakers from the turn names. Professional and Enterprise plans only. Use the `tredit_` id from the event listing.
+Returns the speaker-labelled transcript of an earnings event: ordered segments with a `speaker_id`, and a `speakers` map with each speaker’s name, role, and company where known. The human-edited edition is preferred when one exists. Professional and Enterprise plans only. Use the `tredit_` id from the event listing.
 </dd>
 </dl>
 </dd>
@@ -4849,6 +4967,133 @@ client.fundamentals.ratios.yield_analysis.list(
 <dd>
 
 **limit:** `typing.Optional[int]` — Maximum number of resources to return. Defaults to 50.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**page:** `typing.Optional[str]` — Page token from a previous page's `next_page_url`. Iterating over the result fetches the next pages for you.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## News Company
+<details><summary><code>client.news.company.<a href="src/roicai/news/company/client.py">list</a>(...) -> NewsArticleList</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the news articles about one company, newest first. Identify the company by an exchange and symbol separated by a colon (e.g. `NASDAQ:AAPL`), a ticker ID, or a FIGI; articles about any of its listings are included. Each article appears once, with every company it is about. History follows the plan's lookback limit. Filter by a `published_at` range.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from roicai import Roicai
+from roicai.environment import RoicaiEnvironment
+import datetime
+
+client = Roicai(
+    api_key="<token>",
+    environment=RoicaiEnvironment.DEFAULT,
+)
+
+client.news.company.list(
+    identifier="NASDAQ:AAPL",
+    published_at_gte=datetime.datetime.fromisoformat("2026-11-11T14:37:34+00:00"),
+    published_at_gt=datetime.datetime.fromisoformat("2026-11-11T14:37:34+00:00"),
+    published_at_lte=datetime.datetime.fromisoformat("2026-11-11T14:37:34+00:00"),
+    published_at_lt=datetime.datetime.fromisoformat("2026-11-11T14:37:34+00:00"),
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**identifier:** `str` — The company whose news to list. Accepts an exchange and symbol separated by a colon (e.g. `NASDAQ:AAPL`), a ticker ID, or a FIGI.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**published_at_gte:** `typing.Optional[datetime.datetime]` — Return news published at or after this RFC 3339 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**published_at_gt:** `typing.Optional[datetime.datetime]` — Return news published after this RFC 3339 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**published_at_lte:** `typing.Optional[datetime.datetime]` — Return news published at or before this RFC 3339 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**published_at_lt:** `typing.Optional[datetime.datetime]` — Return news published before this RFC 3339 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**limit:** `typing.Optional[int]` — Maximum number of resources to return. Defaults to 25.
     
 </dd>
 </dl>
