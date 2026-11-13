@@ -98,6 +98,8 @@ if typing.TYPE_CHECKING:
     from .market import Market
     from .market_list import MarketList
     from .market_object import MarketObject
+    from .news_article import NewsArticle
+    from .news_article_list import NewsArticleList
     from .order import Order
     from .per_share_financial_period import PerShareFinancialPeriod
     from .per_share_financial_period_list import PerShareFinancialPeriodList
@@ -226,6 +228,8 @@ _dynamic_imports: typing.Dict[str, str] = {
     "Market": ".market",
     "MarketList": ".market_list",
     "MarketObject": ".market_object",
+    "NewsArticle": ".news_article",
+    "NewsArticleList": ".news_article_list",
     "Order": ".order",
     "PerShareFinancialPeriod": ".per_share_financial_period",
     "PerShareFinancialPeriodList": ".per_share_financial_period_list",
@@ -378,6 +382,8 @@ __all__ = [
     "Market",
     "MarketList",
     "MarketObject",
+    "NewsArticle",
+    "NewsArticleList",
     "Order",
     "PerShareFinancialPeriod",
     "PerShareFinancialPeriodList",
